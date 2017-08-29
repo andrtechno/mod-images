@@ -7,7 +7,7 @@
     "minimum-stability": "dev",
     "require": {
         "yiisoft/yii2": "*",
-        "abeautifulsite/simpleimage": "2.7"
+        "abeautifulsite/simpleimage": "3.3.2"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",
