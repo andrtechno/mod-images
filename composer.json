@@ -1,0 +1,26 @@
+{
+    "name": "panix/mod-images",
+    "description": "CORNER CMS module images",
+    "keywords": ["corner-cms"],
+    "type": "module",
+    "license": "BSD-3-Clause",
+    "minimum-stability": "dev",
+    "require": {
+        "yiisoft/yii2": "*",
+        "abeautifulsite/simpleimage": "2.7"
+    },
+    "require-dev": {
+        "yiisoft/yii2-codeception": "*",
+        "codeception/specify": "*",
+        "codeception/verify": "*",
+        "mikey179/vfsStream": "1.3.*@dev"
+    },
+    "suggest": {
+        "ext-imagick": ""
+    },
+    "autoload": {
+        "psr-4": {
+            "panix\\mod\\images\\": ""
+        }
+    }
+}
