@@ -110,7 +110,7 @@ Installation
     <pre>
        {
             "require": {
-                "costa-rico/mod-images": "dev-master"
+                "panix/mod-images": "dev-master"
             }
        }
     </pre>
