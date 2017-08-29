@@ -6,17 +6,19 @@ use panix\mod\images\models\PlaceHolder;
 use Yii;
 use panix\mod\images\models\Image;
 
-class Module extends \yii\base\Module {
+class Module extends \panix\engine\WebModule { //\yii\base\Module
 
-    public $imagesStorePath = '@app/web/store';
-    public $imagesCachePath = '@app/web/imgCache';
+    public $imagesStorePath = '@app/web/uploads/store';
+    public $imagesCachePath = '@app/web/uploads/cache';
     public $graphicsLibrary = 'GD';
-    public $controllerNamespace = 'panix\mod\images\controllers';
+    //public $controllerNamespace = 'panix\mod\images\controllers';
     public $placeHolderPath;
     public $waterMark = false;
     public $className;
     public $imageCompressionQuality = 85;
-
+    //public $routes = [
+    //    'getImage/<item>/<dirtyAlias>' => 'images/default/imageByItemAndAlias',
+    //];
     public function getImage($item, $dirtyAlias) {
         //Get params
         $params = $data = $this->parseImageAlias($dirtyAlias);

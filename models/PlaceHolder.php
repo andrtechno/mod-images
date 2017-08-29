@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: kostanevazno
@@ -14,33 +15,28 @@ namespace panix\mod\images\models;
 /**
  * TODO: check path to save and all image method for placeholder
  */
+use Yii;
 
-use yii;
-
-class PlaceHolder extends Image
-{
+class PlaceHolder extends Image {
 
     private $modelName = '';
     private $itemId = '';
     public $filePath = 'placeHolder.png';
     public $urlAlias = 'placeHolder';
 
-
     /*  public function getUrl($size = false){
-          $url = $this->getModule()->placeHolderUrl;
-          if(!$url){
-              throw new \Exception('PlaceHolder image must have url setting!!!');
-          }
-          return $url;
-      }*/
+      $url = $this->getModule()->placeHolderUrl;
+      if(!$url){
+      throw new \Exception('PlaceHolder image must have url setting!!!');
+      }
+      return $url;
+      } */
 
-    public function __construct()
-    {
-        $this->filePath =basename(Yii::getAlias($this->getModule()->placeHolderPath)) ;
+    public function __construct() {
+        $this->filePath = basename(Yii::getAlias($this->getModule()->placeHolderPath));
     }
 
-    public function getPathToOrigin()
-    {
+    public function getPathToOrigin() {
 
         $url = Yii::getAlias($this->getModule()->placeHolderPath);
         if (!$url) {
@@ -49,12 +45,12 @@ class PlaceHolder extends Image
         return $url;
     }
 
-    protected  function getSubDur(){
+    protected function getSubDur() {
         return 'placeHolder';
     }
-    public function setMain($isMain = true){
+
+    public function setMain($isMain = true) {
         throw new yii\base\Exception('You must not set placeHolder as main image!!!');
     }
 
 }
-
