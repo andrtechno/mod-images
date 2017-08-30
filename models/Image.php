@@ -93,9 +93,9 @@ class Image extends \yii\db\ActiveRecord {
             $image = new \Imagick($this->getPathToOrigin());
             $sizes = $image->getImageGeometry();
         } else {
-            $image = new \abeautifulsite\SimpleImage($this->getPathToOrigin());
-            $sizes['width'] = $image->get_width();
-            $sizes['height'] = $image->get_height();
+            $image = new \claviska\SimpleImage($this->getPathToOrigin());
+            $sizes['width'] = $image->getWidth();
+            $sizes['height'] = $image->getHeight();
         }
 
         return $sizes;
@@ -158,7 +158,7 @@ class Image extends \yii\db\ActiveRecord {
             $image = new \Imagick($imagePath);
 
             $image->setImageCompressionQuality($this->getModule()->imageCompressionQuality);
-
+            
             if ($size) {
                 if ($size['height'] && $size['width']) {
                     $image->cropThumbnailImage($size['width'], $size['height']);
@@ -174,16 +174,16 @@ class Image extends \yii\db\ActiveRecord {
             $image->writeImage($pathToSave);
         } else {
 
-            $image = new \abeautifulsite\SimpleImage($imagePath);
+            $image = new \claviska\SimpleImage($imagePath);
 
             if ($size) {
                 if ($size['height'] && $size['width']) {
 
                     $image->thumbnail($size['width'], $size['height']);
                 } elseif ($size['height']) {
-                    $image->fit_to_height($size['height']);
+                    $image->fitToHeight($size['height']);
                 } elseif ($size['width']) {
-                    $image->fit_to_width($size['width']);
+                    $image->fitToWidth($size['width']);
                 } else {
                     throw new \Exception('Something wrong with this->module->parseSize($sizeString)');
                 }
@@ -196,18 +196,18 @@ class Image extends \yii\db\ActiveRecord {
                     throw new Exception('WaterMark not detected!');
                 }
 
-                $wmMaxWidth = intval($image->get_width() * 0.4);
-                $wmMaxHeight = intval($image->get_height() * 0.4);
+                $wmMaxWidth = intval($image->getWidth() * 0.4);
+                $wmMaxHeight = intval($image->getHeight() * 0.4);
 
                 $waterMarkPath = Yii::getAlias($this->getModule()->waterMark);
 
-                $waterMark = new \abeautifulsite\SimpleImage($waterMarkPath);
+                $waterMark = new \claviska\SimpleImage($waterMarkPath);
 
 
                 if (
-                        $waterMark->get_height() > $wmMaxHeight
+                        $waterMark->getHeight() > $wmMaxHeight
                         or
-                        $waterMark->get_width() > $wmMaxWidth
+                        $waterMark->getWidth() > $wmMaxWidth
                 ) {
 
                     $waterMarkPath = $this->getModule()->getCachePath() . DIRECTORY_SEPARATOR .
@@ -217,8 +217,8 @@ class Image extends \yii\db\ActiveRecord {
 
                     //throw new Exception($waterMarkPath);
                     if (!file_exists($waterMarkPath)) {
-                        $waterMark->fit_to_width($wmMaxWidth);
-                        $waterMark->save($waterMarkPath, 100);
+                        $waterMark->fitToWidth($wmMaxWidth);
+                        $waterMark->toFile($waterMarkPath, 'image/png',100);
                         if (!file_exists($waterMarkPath)) {
                             throw new Exception('Cant save watermark to ' . $waterMarkPath . '!!!');
                         }
@@ -227,8 +227,8 @@ class Image extends \yii\db\ActiveRecord {
 
                 $image->overlay($waterMarkPath, 'bottom right', .5, -10, -10);
             }
-
-            $image->save($pathToSave, $this->getModule()->imageCompressionQuality);
+            $image->toFile($pathToSave, $image->getMimeType(),$this->getModule()->imageCompressionQuality);
+            //$image->save($pathToSave, $this->getModule()->imageCompressionQuality);
         }
 
         return $image;
