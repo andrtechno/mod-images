@@ -50,9 +50,9 @@ class Module extends \panix\engine\WebModule { //\yii\base\Module
                   ':alias' => $alias
                   ]) */
                 ->one();
-        if (!$image) {
-            return $this->getPlaceHolder();
-        }
+        //if (!$image) {
+        //    return $this->getPlaceHolder();
+        //}
 
         return $image;
     }

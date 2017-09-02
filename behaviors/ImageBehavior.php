@@ -2,16 +2,15 @@
 
 namespace panix\mod\images\behaviors;
 
+use Yii;
 use yii\base\Behavior;
 use yii\db\ActiveRecord;
 use panix\mod\images\models;
-use panix\mod\images\ModuleTrait;
 use panix\mod\images\models\Image;
 use yii\helpers\BaseFileHelper;
 
 class ImageBehavior extends Behavior {
 
-    use ModuleTrait;
 
     public $createAliasMethod = false;
 
@@ -44,8 +43,8 @@ class ImageBehavior extends Behavior {
         $pictureFileName = substr(md5(microtime(true) . $absolutePath), 4, 6)
                 . '.' .
                 pathinfo($absolutePath, PATHINFO_EXTENSION);
-        $pictureSubDir = $this->getModule()->getModelSubDir($this->owner);
-        $storePath = $this->getModule()->getStorePath($this->owner);
+        $pictureSubDir = Yii::$app->getModule('images')->getModelSubDir($this->owner);
+        $storePath = Yii::$app->getModule('images')->getStorePath($this->owner);
 
         $newAbsolutePath = $storePath .
                 DIRECTORY_SEPARATOR . $pictureSubDir .
@@ -59,15 +58,15 @@ class ImageBehavior extends Behavior {
             throw new \Exception('Cant copy file! ' . $absolutePath . ' to ' . $newAbsolutePath);
         }
 
-        if ($this->getModule()->className === null) {
+        if (Yii::$app->getModule('images')->className === null) {
             $image = new Image;
         } else {
-            $class = $this->getModule()->className;
+            $class = Yii::$app->getModule('images')->className;
             $image = new $class();
         }
         $image->itemId = $this->owner->primaryKey;
         $image->filePath = $pictureSubDir . '/' . $pictureFileName;
-        $image->modelName = $this->getModule()->getShortClass($this->owner);
+        $image->modelName = Yii::$app->getModule('images')->getShortClass($this->owner);
         $image->name = $name;
 
         $image->urlAlias = $this->getAlias($image);
@@ -138,8 +137,8 @@ class ImageBehavior extends Behavior {
      * @return bool
      */
     public function clearImagesCache() {
-        $cachePath = $this->getModule()->getCachePath();
-        $subdir = $this->getModule()->getModelSubDir($this->owner);
+        $cachePath = Yii::$app->getModule('images')->getCachePath();
+        $subdir = Yii::$app->getModule('images')->getModelSubDir($this->owner);
 
         $dirToRemove = $cachePath . '/' . $subdir;
 
@@ -160,19 +159,19 @@ class ImageBehavior extends Behavior {
     public function getImages() {
         $finder = $this->getImagesFinder();
 
-        if ($this->getModule()->className === null) {
+        if (Yii::$app->getModule('images')->className === null) {
             $imageQuery = Image::find();
         } else {
-            $class = $this->getModule()->className;
+            $class = Yii::$app->getModule('images')->className;
             $imageQuery = $class::find();
         }
         $imageQuery->where($finder);
         $imageQuery->orderBy(['isMain' => SORT_DESC, 'id' => SORT_ASC]);
 
         $imageRecords = $imageQuery->all();
-        if (!$imageRecords && $this->getModule()->placeHolderPath) {
-            return [$this->getModule()->getPlaceHolder()];
-        }
+        //if (!$imageRecords && Yii::$app->getModule('images')->placeHolderPath) {
+        //    return [Yii::$app->getModule('images')->getPlaceHolder()];
+        //}
         return $imageRecords;
     }
 
@@ -181,10 +180,10 @@ class ImageBehavior extends Behavior {
      * @return array|null|ActiveRecord
      */
     public function getImage() {
-        if ($this->getModule()->className === null) {
+        if (Yii::$app->getModule('images')->className === null) {
             $imageQuery = Image::find();
         } else {
-            $class = $this->getModule()->className;
+            $class = Yii::$app->getModule('images')->className;
             $imageQuery = $class::find();
         }
         $finder = $this->getImagesFinder(['isMain' => 1]);
@@ -193,7 +192,7 @@ class ImageBehavior extends Behavior {
 
         $img = $imageQuery->one();
         if (!$img) {
-            return $this->getModule()->getPlaceHolder();
+            return NULL;//Yii::$app->getModule('images')->getPlaceHolder();
         }
 
         return $img;
@@ -204,10 +203,10 @@ class ImageBehavior extends Behavior {
      * @return array|null|ActiveRecord
      */
     public function getImageByName($name) {
-        if ($this->getModule()->className === null) {
+        if (Yii::$app->getModule('images')->className === null) {
             $imageQuery = Image::find();
         } else {
-            $class = $this->getModule()->className;
+            $class = Yii::$app->getModule('images')->className;
             $imageQuery = $class::find();
         }
         $finder = $this->getImagesFinder(['name' => $name]);
@@ -216,7 +215,8 @@ class ImageBehavior extends Behavior {
 
         $img = $imageQuery->one();
         if (!$img) {
-            return $this->getModule()->getPlaceHolder();
+           // return Yii::$app->getModule('images')->getPlaceHolder();
+            return NULL;
         }
 
         return $img;
@@ -233,8 +233,8 @@ class ImageBehavior extends Behavior {
             foreach ($images as $image) {
                 $this->owner->removeImage($image);
             }
-            $storePath = $this->getModule()->getStorePath($this->owner);
-            $pictureSubDir = $this->getModule()->getModelSubDir($this->owner);
+            $storePath = Yii::$app->getModule('images')->getStorePath($this->owner);
+            $pictureSubDir = Yii::$app->getModule('images')->getModelSubDir($this->owner);
             $dirToRemove = $storePath . DIRECTORY_SEPARATOR . $pictureSubDir;
             BaseFileHelper::removeDirectory($dirToRemove);
         }
@@ -252,7 +252,7 @@ class ImageBehavior extends Behavior {
         }
         $img->clearCache();
 
-        $storePath = $this->getModule()->getStorePath();
+        $storePath = Yii::$app->getModule('images')->getStorePath();
 
         $fileToRemove = $storePath . DIRECTORY_SEPARATOR . $img->filePath;
         if (preg_match('@\.@', $fileToRemove) and is_file($fileToRemove)) {
@@ -265,7 +265,7 @@ class ImageBehavior extends Behavior {
     private function getImagesFinder($additionWhere = false) {
         $base = [
             'itemId' => $this->owner->primaryKey,
-            'modelName' => $this->getModule()->getShortClass($this->owner)
+            'modelName' => Yii::$app->getModule('images')->getShortClass($this->owner)
         ];
 
         if ($additionWhere) {

@@ -17,18 +17,17 @@ use Yii;
 use yii\base\Exception;
 use yii\helpers\Url;
 use yii\helpers\BaseFileHelper;
-use \panix\mod\images\ModuleTrait;
 
 class Image extends \yii\db\ActiveRecord {
 
-    use ModuleTrait;
+
 
     private $helper = false;
 
     public function clearCache() {
         $subDir = $this->getSubDur();
 
-        $dirToRemove = $this->getModule()->getCachePath() . DIRECTORY_SEPARATOR . $subDir;
+        $dirToRemove = Yii::$app->getModule('images')->getCachePath() . DIRECTORY_SEPARATOR . $subDir;
 
         if (preg_match('/' . preg_quote($this->modelName, '/') . '/', $dirToRemove)) {
             BaseFileHelper::removeDirectory($dirToRemove);
@@ -45,7 +44,7 @@ class Image extends \yii\db\ActiveRecord {
     public function getUrl($size = false) {
         $urlSize = ($size) ? '_' . $size : '';
         $url = Url::toRoute([
-                    '/' . $this->getModule()->id . '/get-image',
+                    '/' . Yii::$app->getModule('images')->id . '/get-image',
                     'item' => $this->modelName . $this->itemId,
                     'dirtyAlias' => $this->urlAlias . $urlSize . '.' . $this->getExtension()
         ]);
@@ -55,7 +54,7 @@ class Image extends \yii\db\ActiveRecord {
 
     public function getPath($size = false) {
         $urlSize = ($size) ? '_' . $size : '';
-        $base = $this->getModule()->getCachePath();
+        $base = Yii::$app->getModule('images')->getCachePath();
         $sub = $this->getSubDur();
 
         $origin = $this->getPathToOrigin();
@@ -80,7 +79,7 @@ class Image extends \yii\db\ActiveRecord {
 
     public function getPathToOrigin() {
 
-        $base = $this->getModule()->getStorePath();
+        $base = Yii::$app->getModule('images')->getStorePath();
 
         $filePath = $base . DIRECTORY_SEPARATOR . $this->filePath;
 
@@ -89,7 +88,7 @@ class Image extends \yii\db\ActiveRecord {
 
     public function getSizes() {
         $sizes = false;
-        if ($this->getModule()->graphicsLibrary == 'Imagick') {
+        if (Yii::$app->getModule('images')->graphicsLibrary == 'Imagick') {
             $image = new \Imagick($this->getPathToOrigin());
             $sizes = $image->getImageGeometry();
         } else {
@@ -103,7 +102,7 @@ class Image extends \yii\db\ActiveRecord {
 
     public function getSizesWhen($sizeString) {
 
-        $size = $this->getModule()->parseSize($sizeString);
+        $size = Yii::$app->getModule('images')->parseSize($sizeString);
         if (!$size) {
             throw new \Exception('Bad size..');
         }
@@ -133,7 +132,7 @@ class Image extends \yii\db\ActiveRecord {
             throw new \Exception('Image without urlAlias!');
         }
 
-        $cachePath = $this->getModule()->getCachePath();
+        $cachePath = Yii::$app->getModule('images')->getCachePath();
         $subDirPath = $this->getSubDur();
         $fileExtension = pathinfo($this->filePath, PATHINFO_EXTENSION);
 
@@ -149,15 +148,15 @@ class Image extends \yii\db\ActiveRecord {
 
 
         if ($sizeString) {
-            $size = $this->getModule()->parseSize($sizeString);
+            $size = Yii::$app->getModule('images')->parseSize($sizeString);
         } else {
             $size = false;
         }
 
-        if ($this->getModule()->graphicsLibrary == 'Imagick') {
+        if (Yii::$app->getModule('images')->graphicsLibrary == 'Imagick') {
             $image = new \Imagick($imagePath);
 
-            $image->setImageCompressionQuality($this->getModule()->imageCompressionQuality);
+            $image->setImageCompressionQuality(Yii::$app->getModule('images')->imageCompressionQuality);
             
             if ($size) {
                 if ($size['height'] && $size['width']) {
@@ -190,16 +189,16 @@ class Image extends \yii\db\ActiveRecord {
             }
 
             //WaterMark
-            if ($this->getModule()->waterMark) {
+            if (Yii::$app->getModule('images')->waterMark) {
 
-                if (!file_exists(Yii::getAlias($this->getModule()->waterMark))) {
+                if (!file_exists(Yii::getAlias(Yii::$app->getModule('images')->waterMark))) {
                     throw new Exception('WaterMark not detected!');
                 }
 
                 $wmMaxWidth = intval($image->getWidth() * 0.4);
                 $wmMaxHeight = intval($image->getHeight() * 0.4);
 
-                $waterMarkPath = Yii::getAlias($this->getModule()->waterMark);
+                $waterMarkPath = Yii::getAlias(Yii::$app->getModule('images')->waterMark);
 
                 $waterMark = new \claviska\SimpleImage($waterMarkPath);
 
@@ -210,10 +209,10 @@ class Image extends \yii\db\ActiveRecord {
                         $waterMark->getWidth() > $wmMaxWidth
                 ) {
 
-                    $waterMarkPath = $this->getModule()->getCachePath() . DIRECTORY_SEPARATOR .
-                            pathinfo($this->getModule()->waterMark)['filename'] .
+                    $waterMarkPath = Yii::$app->getModule('images')->getCachePath() . DIRECTORY_SEPARATOR .
+                            pathinfo(Yii::$app->getModule('images')->waterMark)['filename'] .
                             $wmMaxWidth . 'x' . $wmMaxHeight . '.' .
-                            pathinfo($this->getModule()->waterMark)['extension'];
+                            pathinfo(Yii::$app->getModule('images')->waterMark)['extension'];
 
                     //throw new Exception($waterMarkPath);
                     if (!file_exists($waterMarkPath)) {
@@ -227,8 +226,8 @@ class Image extends \yii\db\ActiveRecord {
 
                 $image->overlay($waterMarkPath, 'bottom right', .5, -10, -10);
             }
-            $image->toFile($pathToSave, $image->getMimeType(),$this->getModule()->imageCompressionQuality);
-            //$image->save($pathToSave, $this->getModule()->imageCompressionQuality);
+            $image->toFile($pathToSave, $image->getMimeType(),Yii::$app->getModule('images')->imageCompressionQuality);
+            //$image->save($pathToSave, Yii::$app->getModule('images')->imageCompressionQuality);
         }
 
         return $image;
