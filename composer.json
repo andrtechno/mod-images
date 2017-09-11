@@ -2,7 +2,7 @@
     "name": "panix/mod-images",
     "description": "CORNER CMS module images",
     "keywords": ["corner-cms"],
-    "type": "module",
+    "type": "yii2-extension",
     "license": "BSD-3-Clause",
     "minimum-stability": "dev",
     "require": {
