@@ -42,11 +42,11 @@ class DefaultController extends WebController {
 
                 $page->delete(); //$page->deleteByPk($_REQUEST['id']);
 
-                if ($page->isMain) {
+                if ($page->is_main) {
                     // Get first image and set it as main
                     $model = Image::find();
                     if ($model) {
-                        $model->isMain = 1;
+                        $model->is_main = 1;
                         $model->save();
                     }
                 }
@@ -68,7 +68,12 @@ class DefaultController extends WebController {
         echo \yii\helpers\Json::encode($json);
         die;
     }
-
+ public function actionEditCrop($id) {
+        $entry = Image::find()
+                ->where(['id' => \Yii::$app->request->get('id')])
+                ->one();
+     return $this->render('edit-crop',['image'=>$entry]);
+ }
     public function actionCrop() {
         $request = \Yii::$app->request;
         $post = $request->post();
@@ -81,7 +86,7 @@ class DefaultController extends WebController {
 
             $image->autoOrient();
 
-            $image->overlay('uploads/watermark.png', 'top right');
+           /* $image->overlay('uploads/watermark.png', 'top right');
             $image->text('CORNER CMS 1.1', ['fontFile' => 'uploads/BankGothic RUSS Medium.ttf', 'size' => 30]);
             $image->text('CORNER CMS 1.2', [
                 'fontFile' => 'uploads/BankGothic RUSS Medium.ttf',
@@ -90,16 +95,16 @@ class DefaultController extends WebController {
                 'anchor' => 'top left',
                 'shadow' => ['x' => 3, 'y' => 3, 'color' => '#000000']
             ]);
-            $image->overlay('uploads/watermark.png', 'bottom right', 0.8, -10, -10);
-
-            if (isset($form['width']) && isset($form['height'])) {
-                  $image->resize($form['width'], $form['height']);
-            }
-            if($request->method == 'SETDRAGMODE'){
+            $image->overlay('uploads/watermark.png', 'bottom right', 0.8, -10, -10);*/
+         //   if($request->method == 'SETDRAGMODE'){
             if (isset($form['coord_x']) && isset($form['coord_y'])) {
                 $image->crop($form['coord_x'], $form['coord_y'], $form['coord_x'] + $form['width'], $form['coord_y'] + $form['height']);
             }
+          //  }
+            if (isset($form['width']) && isset($form['height'])) {
+                  $image->resize($form['width'], $form['height']);
             }
+
             //->resize(320)                          // resize to 320x200 pixels
             //->flip('both') 
             //->flip('x')

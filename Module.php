@@ -8,6 +8,11 @@ use panix\mod\images\models\Image;
 
 class Module extends \panix\engine\WebModule { //\yii\base\Module
 
+    public $routes = [
+'images/crop' => 'images/default/crop',
+        'images/delete/<id>' => 'images/default/delete',
+
+    ];
     public $imagesStorePath = '@app/web/uploads/store';
     public $imagesCachePath = '@app/web/uploads/cache';
     public $graphicsLibrary = 'GD';
