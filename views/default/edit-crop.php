@@ -45,6 +45,9 @@
                     <!-- <h3>Data:</h3> -->
                     <div class="docs-data">
                         <div class="input-group input-group-sm">
+                            <?= $form->field($model, 'filepath')->textInput(['value'=> $image->getPathToOrigin()]) ?>
+                        </div>
+                        <div class="input-group input-group-sm">
                             <?= $form->field($model, 'coord_x') ?>
                         </div>
                         <div class="input-group input-group-sm">

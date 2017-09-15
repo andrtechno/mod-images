@@ -72,7 +72,7 @@ class DefaultController extends WebController {
         $entry = Image::find()
                 ->where(['id' => \Yii::$app->request->get('id')])
                 ->one();
-     return $this->render('edit-crop',['image'=>$entry]);
+     return $this->renderAjax('edit-crop',['image'=>$entry]);
  }
     public function actionCrop() {
         $request = \Yii::$app->request;
@@ -82,7 +82,7 @@ class DefaultController extends WebController {
 
         try {
             // Create a new SimpleImage object
-            $image = new \claviska\SimpleImage('uploads/l1kUWA3UOT_20482603_810200375834266_8994343786263871488_n.jpg');
+            $image = new \claviska\SimpleImage($form['filepath']);
 
             $image->autoOrient();
 

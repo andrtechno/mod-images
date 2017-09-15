@@ -156,8 +156,8 @@ class ImageBehavior extends Behavior {
      * First image alwats must be main image
      * @return array|yii\db\ActiveRecord[]
      */
-    public function getImages() {
-        $finder = $this->getImagesFinder();
+    public function getImages($additionWhere=false) {
+        $finder = $this->getImagesFinder($additionWhere);
 
         if (Yii::$app->getModule('images')->className === null) {
             $imageQuery = Image::find();
