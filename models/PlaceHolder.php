@@ -33,7 +33,7 @@ class PlaceHolder extends Image {
       } */
 
     public function __construct() {
-        $this->filePath = basename(Yii::getAlias($this->getModule()->placeHolderPath));
+       // $this->filePath = basename(Yii::getAlias($this->getModule()->placeHolderPath));
     }
 
     public function getPathToOrigin() {

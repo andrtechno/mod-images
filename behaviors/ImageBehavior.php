@@ -86,8 +86,8 @@ class ImageBehavior extends Behavior {
 
         //If main image not exists
         if (
-                is_object($img) && get_class($img) == 'panix\mod\images\models\PlaceHolder'
-                or
+               // is_object($img) && get_class($img) == 'panix\mod\images\models\PlaceHolder'
+                //or
                 $img == null
                 or
                 $isMain
