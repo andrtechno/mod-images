@@ -5,8 +5,8 @@
  *
  * @property integer $id
  * @property string $filePath
- * @property integer $itemId
- * @property integer $isMain
+ * @property integer $object_id
+ * @property integer $is_main
  * @property string $modelName
  * @property string $urlAlias
  */
@@ -18,8 +18,7 @@ use yii\base\Exception;
 use yii\helpers\Url;
 use yii\helpers\BaseFileHelper;
 
-class Image extends \yii\db\ActiveRecord {
-
+class Image extends \panix\engine\db\ActiveRecord {
 
 
     private $helper = false;
@@ -45,7 +44,7 @@ class Image extends \yii\db\ActiveRecord {
         $urlSize = ($size) ? '_' . $size : '';
         $url = Url::toRoute([
                     '/' . Yii::$app->getModule('images')->id . '/get-image',
-                    'item' => $this->modelName . $this->itemId,
+                    'item' => $this->modelName . $this->object_id,
                     'dirtyAlias' => $this->urlAlias . $urlSize . '.' . $this->getExtension()
         ]);
 
@@ -233,11 +232,11 @@ class Image extends \yii\db\ActiveRecord {
         return $image;
     }
 
-    public function setMain($isMain = true) {
-        if ($isMain) {
-            $this->isMain = 1;
+    public function setMain($is_main = true) {
+        if ($is_main) {
+            $this->is_main = 1;
         } else {
-            $this->isMain = 0;
+            $this->is_main = 0;
         }
     }
 
@@ -246,7 +245,7 @@ class Image extends \yii\db\ActiveRecord {
     }
 
     protected function getSubDur() {
-        return \yii\helpers\Inflector::pluralize($this->modelName) . '/' . $this->modelName . $this->itemId;
+        return \yii\helpers\Inflector::pluralize($this->modelName) . '/' . $this->modelName . $this->object_id;
     }
 
     /**
@@ -261,9 +260,9 @@ class Image extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['filePath', 'itemId', 'modelName', 'urlAlias'], 'required'],
-            [['itemId', 'isMain'], 'integer'],
-            [['name'], 'string', 'max' => 80],
+            [['filePath', 'object_id', 'modelName', 'urlAlias'], 'required'],
+            [['object_id', 'is_main'], 'integer'],
+            [['alt_title'], 'string', 'max' => 80],
             [['filePath', 'urlAlias'], 'string', 'max' => 400],
             [['modelName'], 'string', 'max' => 150]
         ];
@@ -276,8 +275,8 @@ class Image extends \yii\db\ActiveRecord {
         return [
             'id' => 'ID',
             'filePath' => 'File Path',
-            'itemId' => 'Item ID',
-            'isMain' => 'Is Main',
+            'object_id' => 'Item ID',
+            'is_main' => 'Is Main',
             'modelName' => 'Model Name',
             'urlAlias' => 'Url Alias',
         ];

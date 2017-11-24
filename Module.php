@@ -31,7 +31,7 @@ class Module extends \panix\engine\WebModule { //\yii\base\Module
         $alias = $params['alias'];
         $size = $params['size'];
 
-        $itemId = preg_replace('/[^0-9]+/', '', $item);
+        $object_id = preg_replace('/[^0-9]+/', '', $item);
         $modelName = preg_replace('/[0-9]+/', '', $item);
 
 
@@ -45,13 +45,13 @@ class Module extends \panix\engine\WebModule { //\yii\base\Module
         $image = $imageQuery
                 ->where([
                     'modelName' => $modelName,
-                    'itemId' => $itemId,
+                    'object_id' => $object_id,
                     'urlAlias' => $alias
                 ])
-                /*     ->where('modelName = :modelName AND itemId = :itemId AND urlAlias = :alias',
+                /*     ->where('modelName = :modelName AND object_id = :object_id AND urlAlias = :alias',
                   [
                   ':modelName' => $modelName,
-                  ':itemId' => $itemId,
+                  ':object_id' => $object_id,
                   ':alias' => $alias
                   ]) */
                 ->one();
@@ -73,7 +73,7 @@ class Module extends \panix\engine\WebModule { //\yii\base\Module
     public function getModelSubDir($model) {
 
         $modelName = $this->getShortClass($model);
-        $modelDir = \yii\helpers\Inflector::pluralize($modelName) . '/' . $modelName . $model->id;
+        $modelDir = \yii\helpers\Inflector::pluralize($modelName) . '/' . $model->id;
         return $modelDir;
     }
 

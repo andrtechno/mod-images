@@ -11,8 +11,23 @@ use yii\helpers\BaseFileHelper;
 
 class ImageBehavior extends Behavior {
 
-
     public $createAliasMethod = false;
+
+    public function attach($owner) {
+        parent::attach($owner);
+    }
+
+    public function events() {
+        return [
+            ActiveRecord::EVENT_AFTER_INSERT => 'afterSave',
+            ActiveRecord::EVENT_AFTER_UPDATE => 'afterSave',
+        ];
+    }
+
+    public function afterSave() {
+        $this->updateMainImage();
+        $this->updateImageTitles();
+    }
 
     /**
      * @var ActiveRecord|null Model class, which will be used for storing image data in db, if not set default class(models/Image) will be used
@@ -23,11 +38,11 @@ class ImageBehavior extends Behavior {
      * Method copies image file to module store and creates db record.
      *
      * @param $absolutePath
-     * @param bool $isMain
+     * @param bool $is_main
      * @return bool|Image
      * @throws \Exception
      */
-    public function attachImage($absolutePath, $isMain = false, $name = '') {
+    public function attachImage($absolutePath, $is_main = false, $name = '') {
         if (!preg_match('#http#', $absolutePath)) {
             if (!file_exists($absolutePath)) {
                 throw new \Exception('File not exist! :' . $absolutePath);
@@ -64,10 +79,10 @@ class ImageBehavior extends Behavior {
             $class = Yii::$app->getModule('images')->className;
             $image = new $class();
         }
-        $image->itemId = $this->owner->primaryKey;
+        $image->object_id = $this->owner->primaryKey;
         $image->filePath = $pictureSubDir . '/' . $pictureFileName;
         $image->modelName = Yii::$app->getModule('images')->getShortClass($this->owner);
-        $image->name = $name;
+        $image->alt_title = $name;
 
         $image->urlAlias = $this->getAlias($image);
 
@@ -86,11 +101,9 @@ class ImageBehavior extends Behavior {
 
         //If main image not exists
         if (
-               // is_object($img) && get_class($img) == 'panix\mod\images\models\PlaceHolder'
-                //or
                 $img == null
                 or
-                $isMain
+                $is_main
         ) {
             $this->setMainImage($image);
         }
@@ -105,7 +118,8 @@ class ImageBehavior extends Behavior {
      * @throws \Exception
      */
     public function setMainImage($img) {
-        if ($this->owner->primaryKey != $img->itemId) {
+
+        if ($this->owner->primaryKey != $img->object_id) {
             throw new \Exception('Image must belong to this model');
         }
         $counter = 1;
@@ -156,7 +170,7 @@ class ImageBehavior extends Behavior {
      * First image alwats must be main image
      * @return array|yii\db\ActiveRecord[]
      */
-    public function getImages($additionWhere=false) {
+    public function getImages($additionWhere = false) {
         $finder = $this->getImagesFinder($additionWhere);
 
         if (Yii::$app->getModule('images')->className === null) {
@@ -166,7 +180,8 @@ class ImageBehavior extends Behavior {
             $imageQuery = $class::find();
         }
         $imageQuery->where($finder);
-        $imageQuery->orderBy(['isMain' => SORT_DESC, 'id' => SORT_ASC]);
+        //$imageQuery->orderBy(['is_main' => SORT_DESC, 'id' => SORT_ASC]);
+        $imageQuery->orderBy(['id' => SORT_DESC]);
 
         $imageRecords = $imageQuery->all();
         //if (!$imageRecords && Yii::$app->getModule('images')->placeHolderPath) {
@@ -186,13 +201,14 @@ class ImageBehavior extends Behavior {
             $class = Yii::$app->getModule('images')->className;
             $imageQuery = $class::find();
         }
-        $finder = $this->getImagesFinder(['isMain' => 1]);
+        $finder = $this->getImagesFinder(['is_main' => 1]);
         $imageQuery->where($finder);
-        $imageQuery->orderBy(['isMain' => SORT_DESC, 'id' => SORT_ASC]);
+        //$imageQuery->orderBy(['is_main' => SORT_DESC, 'id' => SORT_ASC]);
+        $imageQuery->orderBy(['id' => SORT_DESC]);
 
         $img = $imageQuery->one();
         if (!$img) {
-            return NULL;//Yii::$app->getModule('images')->getPlaceHolder();
+            return NULL; //Yii::$app->getModule('images')->getPlaceHolder();
         }
 
         return $img;
@@ -211,11 +227,12 @@ class ImageBehavior extends Behavior {
         }
         $finder = $this->getImagesFinder(['name' => $name]);
         $imageQuery->where($finder);
-        $imageQuery->orderBy(['isMain' => SORT_DESC, 'id' => SORT_ASC]);
+        //$imageQuery->orderBy(['is_main' => SORT_DESC, 'id' => SORT_ASC]);
+        $imageQuery->orderBy(['id' => SORT_DESC]);
 
         $img = $imageQuery->one();
         if (!$img) {
-           // return Yii::$app->getModule('images')->getPlaceHolder();
+            // return Yii::$app->getModule('images')->getPlaceHolder();
             return NULL;
         }
 
@@ -264,7 +281,7 @@ class ImageBehavior extends Behavior {
 
     private function getImagesFinder($additionWhere = false) {
         $base = [
-            'itemId' => $this->owner->primaryKey,
+            'object_id' => $this->owner->primaryKey,
             'modelName' => Yii::$app->getModule('images')->getShortClass($this->owner)
         ];
 
@@ -302,6 +319,29 @@ class ImageBehavior extends Behavior {
         $imagesCount = count($this->owner->getImages());
 
         return $aliasWords . '-' . intval($imagesCount + 1);
+    }
+
+    protected function updateMainImage() {
+        $post = Yii::$app->request->post('AttachmentsMainId');
+        if ($post) {
+            $modelName = Yii::$app->getModule('images')->getShortClass($this->owner);
+
+            Image::updateAll(['is_main' => 0], 'object_id=:pid AND modelName=:model', ['model' => $modelName, 'pid' => $this->owner->primaryKey]);
+
+            $customer = Image::findOne($post);
+            $customer->is_main = 1;
+            $customer->update();
+        }
+    }
+
+    protected function updateImageTitles() {
+        if (sizeof(Yii::$app->request->post('attachment_image_titles', []))) {
+            foreach (Yii::$app->request->post('attachment_image_titles', []) as $id => $title) {
+                $customer = Image::findOne($id);
+                $customer->alt_title = $title;
+                $customer->update();
+            }
+        }
     }
 
 }
