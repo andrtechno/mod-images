@@ -24,6 +24,7 @@ class ImageBehavior extends Behavior {
         ];
     }
 
+
     public function afterSave() {
         $this->updateMainImage();
         $this->updateImageTitles();
@@ -329,17 +330,21 @@ class ImageBehavior extends Behavior {
             Image::updateAll(['is_main' => 0], 'object_id=:pid AND modelName=:model', ['model' => $modelName, 'pid' => $this->owner->primaryKey]);
 
             $customer = Image::findOne($post);
+         
             $customer->is_main = 1;
             $customer->update();
+           
         }
     }
 
     protected function updateImageTitles() {
         if (sizeof(Yii::$app->request->post('attachment_image_titles', []))) {
             foreach (Yii::$app->request->post('attachment_image_titles', []) as $id => $title) {
+                if(!empty($title)){
                 $customer = Image::findOne($id);
                 $customer->alt_title = $title;
                 $customer->update();
+                }
             }
         }
     }

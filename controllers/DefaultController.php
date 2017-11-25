@@ -33,19 +33,24 @@ class DefaultController extends WebController {
     }
 
     public function actionDelete() {
-        $json = array();
+        $json = [];
+
+        $modelName = (new \ReflectionClass(Yii::$app->request->post('model')))->getShortName();
         $entry = Image::find()
-                ->where(['id' => \Yii::$app->request->post('id')])
+                ->where(['id' => Yii::$app->request->post('id')])
                 ->all();
         if (!empty($entry)) {
             foreach ($entry as $page) {
-                //if (!in_array($page->primaryKey, $model->hidden_delete)) {
+                if (!in_array($page->primaryKey, $page->disallow_delete)) {
 
                 $page->delete(); //$page->deleteByPk($_REQUEST['id']);
 
                 if ($page->is_main) {
                     // Get first image and set it as main
-                    $model = Image::find();
+                    $model = Image::find()
+                            ->where(['object_id' => Yii::$app->request->post('object_id'),'modelName' => $modelName])
+                            ->one();
+    
                     if ($model) {
                         $model->is_main = 1;
                         $model->save(false);
@@ -58,12 +63,12 @@ class DefaultController extends WebController {
                 //       'status' => 'error',
                 //         'message' => Yii::t('app', 'ERROR_RECORD_DELETE')
                 //    );
-                //}
+                }
             }
-                            $json = array(
+                            $json =[
                     'status' => 'success',
                     'message' => Yii::t('app', 'SUCCESS_RECORD_DELETE')
-                );
+                ];
         }
 
 
@@ -73,7 +78,7 @@ class DefaultController extends WebController {
 
     public function actionEditCrop($id) {
         $entry = Image::find()
-                ->where(['id' => \Yii::$app->request->get('id')])
+                ->where(['id' => Yii::$app->request->get('id')])
                 ->one();
         return $this->renderAjax('edit-crop', ['image' => $entry]);
     }
