@@ -20,7 +20,6 @@ use yii\helpers\BaseFileHelper;
 
 class Image extends \panix\engine\db\ActiveRecord {
 
-
     private $helper = false;
 
     public function clearCache() {
@@ -45,7 +44,7 @@ class Image extends \panix\engine\db\ActiveRecord {
         $url = Url::toRoute([
                     '/' . Yii::$app->getModule('images')->id . '/get-image',
                     'item' => $this->object_id,
-            'm' => $this->modelName,
+                    'm' => $this->modelName,
                     //'item' => $this->modelName . $this->object_id,
                     'dirtyAlias' => $this->urlAlias . $urlSize . '.' . $this->getExtension()
         ]);
@@ -158,7 +157,7 @@ class Image extends \panix\engine\db\ActiveRecord {
             $image = new \Imagick($imagePath);
 
             $image->setImageCompressionQuality(Yii::$app->getModule('images')->imageCompressionQuality);
-            
+
             if ($size) {
                 if ($size['height'] && $size['width']) {
                     $image->cropThumbnailImage($size['width'], $size['height']);
@@ -214,7 +213,7 @@ class Image extends \panix\engine\db\ActiveRecord {
                     //throw new Exception($waterMarkPath);
                     if (!file_exists($waterMarkPath)) {
                         $waterMark->fitToWidth($wmMaxWidth);
-                        $waterMark->toFile($waterMarkPath, 'image/png',100);
+                        $waterMark->toFile($waterMarkPath, 'image/png', 100);
                         if (!file_exists($waterMarkPath)) {
                             throw new Exception('Cant save watermark to ' . $waterMarkPath . '!!!');
                         }
@@ -223,7 +222,7 @@ class Image extends \panix\engine\db\ActiveRecord {
 
                 $image->overlay($waterMarkPath, 'bottom right', .5, -10, -10);
             }
-            $image->toFile($pathToSave, $image->getMimeType(),Yii::$app->getModule('images')->imageCompressionQuality);
+            $image->toFile($pathToSave, $image->getMimeType(), Yii::$app->getModule('images')->imageCompressionQuality);
             //$image->save($pathToSave, Yii::$app->getModule('images')->imageCompressionQuality);
         }
 
@@ -243,7 +242,7 @@ class Image extends \panix\engine\db\ActiveRecord {
     }
 
     protected function getSubDur() {
-        return \yii\helpers\Inflector::pluralize($this->modelName) . '/'. $this->object_id;
+        return \yii\helpers\Inflector::pluralize($this->modelName) . '/' . $this->object_id;
     }
 
     /**
@@ -280,4 +279,15 @@ class Image extends \panix\engine\db\ActiveRecord {
         ];
     }
 
+    public function afterDelete() {
+        $this->clearCache();
+        $storePath = Yii::$app->getModule('images')->getStorePath();
+
+        $fileToRemove = $storePath . DIRECTORY_SEPARATOR . $this->filePath;
+        if (preg_match('@\.@', $fileToRemove) and is_file($fileToRemove)) {
+            unlink($fileToRemove);
+        }
+      
+        parent::afterDelete();
+    }
 }

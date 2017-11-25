@@ -20,7 +20,7 @@ class DefaultController extends WebController {
         $alias = isset(explode('_', $dirtyAlias)[0]) ? explode('_', $dirtyAlias)[0] : false;
         $image = \Yii::$app->getModule('images')->getImage($item, $m, $alias);
 
-        
+
         if ($image && $image->getExtension() != $dotParts[1]) {
             throw new \yii\web\HttpException(404, 'Image not found (extension)');
         }
@@ -44,32 +44,27 @@ class DefaultController extends WebController {
             foreach ($entry as $page) {
                 if (!in_array($page->primaryKey, $page->disallow_delete)) {
 
-                $page->delete(); //$page->deleteByPk($_REQUEST['id']);
+                    $page->delete();
 
-                if ($page->is_main) {
-                    // Get first image and set it as main
-                    $model = Image::find()
-                            ->where(['object_id' => Yii::$app->request->post('object_id'),'modelName' => $modelName])
-                            ->one();
-    
-                    if ($model) {
-                        $model->is_main = 1;
-                        $model->save(false);
+                    
+                    if ($page->is_main) {
+                        // Get first image and set it as main
+                        $model = Image::find()
+                                ->where(['object_id' => Yii::$app->request->post('object_id'), 'modelName' => $modelName])
+                                ->one();
+
+                        if ($model) {
+                            $model->is_main = 1;
+                            $model->save(false);
+                        }
                     }
-                }
 
-
-                //} else {
-                //    $json = array(
-                //       'status' => 'error',
-                //         'message' => Yii::t('app', 'ERROR_RECORD_DELETE')
-                //    );
                 }
             }
-                            $json =[
-                    'status' => 'success',
-                    'message' => Yii::t('app', 'SUCCESS_RECORD_DELETE')
-                ];
+            $json = [
+                'status' => 'success',
+                'message' => Yii::t('app', 'SUCCESS_RECORD_DELETE')
+            ];
         }
 
 

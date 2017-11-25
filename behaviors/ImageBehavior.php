@@ -21,6 +21,7 @@ class ImageBehavior extends Behavior {
         return [
             ActiveRecord::EVENT_AFTER_INSERT => 'afterSave',
             ActiveRecord::EVENT_AFTER_UPDATE => 'afterSave',
+
         ];
     }
 
@@ -260,6 +261,8 @@ class ImageBehavior extends Behavior {
         }
     }
 
+    
+
     /**
      * removes concrete model's image
      * @param Image $img
@@ -278,8 +281,8 @@ class ImageBehavior extends Behavior {
         if (preg_match('@\.@', $fileToRemove) and is_file($fileToRemove)) {
             unlink($fileToRemove);
         }
-        $img->delete();
-        return true;
+        //$img->delete();
+      //  return true;
     }
 
     private function getImagesFinder($additionWhere = false) {
