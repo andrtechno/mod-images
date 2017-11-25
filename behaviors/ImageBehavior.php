@@ -44,13 +44,13 @@ class ImageBehavior extends Behavior {
      * @throws \Exception
      */
     public function attachImage($absolutePath, $is_main = false, $name = '') {
-        if (!preg_match('#http#', $absolutePath)) {
+        /*if (!preg_match('#http#', $absolutePath)) {
             if (!file_exists($absolutePath)) {
                 throw new \Exception('File not exist! :' . $absolutePath);
             }
         } else {
             //nothing
-        }
+        }*/
 
         if (!$this->owner->primaryKey) {
             throw new \Exception('Owner must have primaryKey when you attach image!');
@@ -69,7 +69,9 @@ class ImageBehavior extends Behavior {
         BaseFileHelper::createDirectory($storePath . DIRECTORY_SEPARATOR . $pictureSubDir, 0775, true);
 
         copy($absolutePath, $newAbsolutePath);
-
+        if(file_exists($absolutePath)){
+            unlink($absolutePath);
+        }
         if (!file_exists($newAbsolutePath)) {
             throw new \Exception('Cant copy file! ' . $absolutePath . ' to ' . $newAbsolutePath);
         }

@@ -8,7 +8,7 @@ use panix\mod\images\models\Image;
 
 class DefaultController extends WebController {
 
-    public function actionGetImage($item = '', $dirtyAlias) {
+    public function actionGetImage($item = '', $m = '', $dirtyAlias) {
 
         $dotParts = explode('.', $dirtyAlias);
         if (!isset($dotParts[1])) {
@@ -18,7 +18,7 @@ class DefaultController extends WebController {
 
         $size = isset(explode('_', $dirtyAlias)[1]) ? explode('_', $dirtyAlias)[1] : false;
         $alias = isset(explode('_', $dirtyAlias)[0]) ? explode('_', $dirtyAlias)[0] : false;
-        $image = \Yii::$app->getModule('images')->getImage($item, $alias);
+        $image = \Yii::$app->getModule('images')->getImage($item, $m, $alias);
 
         if ($image->getExtension() != $dotParts[1]) {
             throw new \yii\web\HttpException(404, 'Image not found (extension)');

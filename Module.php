@@ -2,11 +2,11 @@
 
 namespace panix\mod\images;
 
-use panix\mod\images\models\PlaceHolder;
 use Yii;
+use panix\mod\images\models\PlaceHolder;
 use panix\mod\images\models\Image;
 
-class Module extends \panix\engine\WebModule { //\yii\base\Module
+class Module extends \panix\engine\WebModule {
 
     public $routes = [
 'images/crop' => 'images/default/crop',
@@ -24,15 +24,15 @@ class Module extends \panix\engine\WebModule { //\yii\base\Module
     //public $routes = [
     //    'getImage/<item>/<dirtyAlias>' => 'images/default/imageByItemAndAlias',
     //];
-    public function getImage($item, $dirtyAlias) {
+    public function getImage($object_id, $model, $dirtyAlias) {
         //Get params
         $params = $data = $this->parseImageAlias($dirtyAlias);
 
         $alias = $params['alias'];
         $size = $params['size'];
 
-        $object_id = preg_replace('/[^0-9]+/', '', $item);
-        $modelName = preg_replace('/[0-9]+/', '', $item);
+       // $object_id = preg_replace('/[^0-9]+/', '', $item);
+      //  $modelName = preg_replace('/[0-9]+/', '', $item);
 
 
         //Lets get image
@@ -44,7 +44,7 @@ class Module extends \panix\engine\WebModule { //\yii\base\Module
         }
         $image = $imageQuery
                 ->where([
-                    'modelName' => $modelName,
+                    'modelName' => $model,
                     'object_id' => $object_id,
                     'urlAlias' => $alias
                 ])

@@ -1,15 +1,4 @@
 <?php
-
-/**
- * Created by PhpStorm.
- * User: kostanevazno
- * Date: 05.08.14
- * Time: 18:21
- *
- * TODO: check that placeholder is enable in module class
- * override methods
- */
-
 namespace panix\mod\images\models;
 
 /**

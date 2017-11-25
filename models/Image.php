@@ -44,7 +44,9 @@ class Image extends \panix\engine\db\ActiveRecord {
         $urlSize = ($size) ? '_' . $size : '';
         $url = Url::toRoute([
                     '/' . Yii::$app->getModule('images')->id . '/get-image',
-                    'item' => $this->modelName . $this->object_id,
+                    'item' => $this->object_id,
+            'm' => $this->modelName,
+                    //'item' => $this->modelName . $this->object_id,
                     'dirtyAlias' => $this->urlAlias . $urlSize . '.' . $this->getExtension()
         ]);
 
@@ -61,6 +63,7 @@ class Image extends \panix\engine\db\ActiveRecord {
         $filePath = $base . DIRECTORY_SEPARATOR .
                 $sub . DIRECTORY_SEPARATOR . $this->urlAlias . $urlSize . '.' . pathinfo($origin, PATHINFO_EXTENSION);
         ;
+
         if (!file_exists($filePath)) {
             $this->createVersion($origin, $size);
 
@@ -132,6 +135,7 @@ class Image extends \panix\engine\db\ActiveRecord {
         }
 
         $cachePath = Yii::$app->getModule('images')->getCachePath();
+
         $subDirPath = $this->getSubDur();
         $fileExtension = pathinfo($this->filePath, PATHINFO_EXTENSION);
 
@@ -202,11 +206,7 @@ class Image extends \panix\engine\db\ActiveRecord {
                 $waterMark = new \claviska\SimpleImage($waterMarkPath);
 
 
-                if (
-                        $waterMark->getHeight() > $wmMaxHeight
-                        or
-                        $waterMark->getWidth() > $wmMaxWidth
-                ) {
+                if ($waterMark->getHeight() > $wmMaxHeight or $waterMark->getWidth() > $wmMaxWidth) {
 
                     $waterMarkPath = Yii::$app->getModule('images')->getCachePath() . DIRECTORY_SEPARATOR .
                             pathinfo(Yii::$app->getModule('images')->waterMark)['filename'] .
@@ -245,7 +245,7 @@ class Image extends \panix\engine\db\ActiveRecord {
     }
 
     protected function getSubDur() {
-        return \yii\helpers\Inflector::pluralize($this->modelName) . '/' . $this->modelName . $this->object_id;
+        return \yii\helpers\Inflector::pluralize($this->modelName) . '/'. $this->object_id;
     }
 
     /**
