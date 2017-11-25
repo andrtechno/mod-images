@@ -31,9 +31,6 @@ class Module extends \panix\engine\WebModule {
         $alias = $params['alias'];
         $size = $params['size'];
 
-       // $object_id = preg_replace('/[^0-9]+/', '', $item);
-      //  $modelName = preg_replace('/[0-9]+/', '', $item);
-
 
         //Lets get image
         if (empty($this->className)) {

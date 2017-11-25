@@ -20,7 +20,8 @@ class DefaultController extends WebController {
         $alias = isset(explode('_', $dirtyAlias)[0]) ? explode('_', $dirtyAlias)[0] : false;
         $image = \Yii::$app->getModule('images')->getImage($item, $m, $alias);
 
-        if ($image->getExtension() != $dotParts[1]) {
+        
+        if ($image && $image->getExtension() != $dotParts[1]) {
             throw new \yii\web\HttpException(404, 'Image not found (extension)');
         }
 

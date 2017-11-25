@@ -80,9 +80,7 @@ class Image extends \panix\engine\db\ActiveRecord {
     }
 
     public function getPathToOrigin() {
-
         $base = Yii::$app->getModule('images')->getStorePath();
-
         $filePath = $base . DIRECTORY_SEPARATOR . $this->filePath;
 
         return $filePath;
