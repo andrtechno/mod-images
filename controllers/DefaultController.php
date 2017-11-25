@@ -8,6 +8,15 @@ use panix\mod\images\models\Image;
 
 class DefaultController extends WebController {
 
+    public function actions() {
+        return [
+            'sortable' => [
+                'class' => \panix\engine\grid\sortable\Action::className(),
+                'modelClass' => Image::className(),
+            ],
+        ];
+    }
+
     public function actionGetImage($item = '', $m = '', $dirtyAlias) {
 
         $dotParts = explode('.', $dirtyAlias);
@@ -46,7 +55,7 @@ class DefaultController extends WebController {
 
                     $page->delete();
 
-                    
+
                     if ($page->is_main) {
                         // Get first image and set it as main
                         $model = Image::find()
@@ -58,7 +67,6 @@ class DefaultController extends WebController {
                             $model->save(false);
                         }
                     }
-
                 }
             }
             $json = [

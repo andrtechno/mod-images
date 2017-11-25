@@ -43,10 +43,10 @@ class ImageSearch extends Image {
         $query = Image::find();
         //$query->joinWith('translations');
 
-
+$query->orderBy(['ordern' => SORT_DESC]);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            //'sort' => self::getSort()
+            'sort' => self::getSort()
         ]);
 
         $this->load($params);

@@ -9,8 +9,9 @@ use panix\mod\images\models\Image;
 class Module extends \panix\engine\WebModule {
 
     public $routes = [
-'images/crop' => 'images/default/crop',
+        'images/crop' => 'images/default/crop',
         'images/delete/<id>' => 'images/default/delete',
+        'images/sortable' => 'images/default/sortable',
 
     ];
     public $imagesStorePath = '@app/web/uploads/store';

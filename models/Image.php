@@ -51,7 +51,13 @@ class Image extends \panix\engine\db\ActiveRecord {
 
         return $url;
     }
-
+    public static function getSort() {
+        return new \yii\data\Sort([
+            'attributes' => [
+                'alt_title',
+            ],
+        ]);
+    }
     public function getPath($size = false) {
         $urlSize = ($size) ? '_' . $size : '';
         $base = Yii::$app->getModule('images')->getCachePath();

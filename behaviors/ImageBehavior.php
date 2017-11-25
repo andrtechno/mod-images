@@ -185,7 +185,7 @@ class ImageBehavior extends Behavior {
         }
         $imageQuery->where($finder);
         //$imageQuery->orderBy(['is_main' => SORT_DESC, 'id' => SORT_ASC]);
-        $imageQuery->orderBy(['id' => SORT_DESC]);
+        $imageQuery->orderBy(['ordern' => SORT_DESC]);
 
         $imageRecords = $imageQuery->all();
         //if (!$imageRecords && Yii::$app->getModule('images')->placeHolderPath) {
@@ -208,7 +208,7 @@ class ImageBehavior extends Behavior {
         $finder = $this->getImagesFinder(['is_main' => 1]);
         $imageQuery->where($finder);
         //$imageQuery->orderBy(['is_main' => SORT_DESC, 'id' => SORT_ASC]);
-        $imageQuery->orderBy(['id' => SORT_DESC]);
+        $imageQuery->orderBy(['ordern' => SORT_DESC]);
 
         $img = $imageQuery->one();
         if (!$img) {
@@ -232,7 +232,7 @@ class ImageBehavior extends Behavior {
         $finder = $this->getImagesFinder(['name' => $name]);
         $imageQuery->where($finder);
         //$imageQuery->orderBy(['is_main' => SORT_DESC, 'id' => SORT_ASC]);
-        $imageQuery->orderBy(['id' => SORT_DESC]);
+        $imageQuery->orderBy(['ordern' => SORT_DESC]);
 
         $img = $imageQuery->one();
         if (!$img) {
