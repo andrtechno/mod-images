@@ -51,6 +51,7 @@ class Image extends \panix\engine\db\ActiveRecord {
 
         return $url;
     }
+
     public static function getSort() {
         return new \yii\data\Sort([
             'attributes' => [
@@ -58,6 +59,7 @@ class Image extends \panix\engine\db\ActiveRecord {
             ],
         ]);
     }
+
     public function getPath($size = false) {
         $urlSize = ($size) ? '_' . $size : '';
         $base = Yii::$app->getModule('images')->getCachePath();
@@ -87,7 +89,11 @@ class Image extends \panix\engine\db\ActiveRecord {
     public function getPathToOrigin() {
         $base = Yii::$app->getModule('images')->getStorePath();
         $filePath = $base . DIRECTORY_SEPARATOR . $this->filePath;
+        return $filePath;
+    }
 
+    public function getUrlToOrigin() {
+        $filePath = Yii::getAlias('@web/uploads/store') . DIRECTORY_SEPARATOR . $this->filePath;
         return $filePath;
     }
 
@@ -293,7 +299,8 @@ class Image extends \panix\engine\db\ActiveRecord {
         if (preg_match('@\.@', $fileToRemove) and is_file($fileToRemove)) {
             unlink($fileToRemove);
         }
-      
+
         parent::afterDelete();
     }
+
 }

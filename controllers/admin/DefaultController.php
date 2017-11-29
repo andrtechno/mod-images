@@ -126,7 +126,7 @@ class DefaultController extends WebController {
             //->flip('both') 
             //->flip('x')
             if ($request->method == 'ROTATE' && isset($post['CropperForm']['rotate'])) {
-                 $image->rotate($post['CropperForm']['rotate']);
+                // $image->rotate($post['CropperForm']['rotate']);
             }
             // flip horizontally
             //->colorize('#3e8230')                      // tint dark blue

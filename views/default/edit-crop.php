@@ -18,6 +18,9 @@
 
   <?php
         $model = new panix\ext\cropper\CropperForm();
+        
+       
+        
         ?>
 
 
@@ -29,7 +32,7 @@
                 <div class="col-md-9">
                     <!-- <h3>Demo:</h3> -->
                     <div class="img-container">
-                        <img id="image" src="/<?=$image->getPathToOrigin()?>" alt="Picture">
+                        <img id="image" src="<?=$image->getUrlToOrigin()?>" alt="Picture">
 
                     </div>
                 </div>
@@ -134,12 +137,12 @@
                     <div class="btn-group">
                         <button type="button" class="btn btn-primary" data-method="rotate" data-option="-45" title="Rotate Left">
                             <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="$().cropper(&quot;rotate&quot;, -45)">
-                                <span class="fa fa-rotate-left"></span>
+                                Rotate left
                             </span>
                         </button>
                         <button type="button" class="btn btn-primary" data-method="rotate" data-option="45" title="Rotate Right">
                             <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="$().cropper(&quot;rotate&quot;, 45)">
-                                <span class="fa fa-rotate-right"></span>
+                                Rotate right
                             </span>
                         </button>
                     </div>
