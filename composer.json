@@ -1,7 +1,7 @@
 {
     "name": "panix/mod-images",
-    "description": "CORNER CMS module images",
-    "keywords": ["corner-cms"],
+    "description": "PIXELION CMS module images",
+    "keywords": ["pixelion-cms"],
     "type": "yii2-extension",
     "license": "BSD-3-Clause",
     "minimum-stability": "dev",
