@@ -11,8 +11,8 @@ class DefaultController extends WebController {
     public function actions() {
         return [
             'sortable' => [
-                'class' => \panix\engine\grid\sortable\Action::className(),
-                'modelClass' => Image::className(),
+                'class' => \panix\engine\grid\sortable\Action::class,
+                'modelClass' => Image::class,
             ],
         ];
     }

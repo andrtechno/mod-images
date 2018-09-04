@@ -287,7 +287,7 @@ class ActiveRecordImage extends ActiveRecord
     public function behaviors()
     {
         return [
-            ImageBehave::className(),
+            ImageBehave::class,
         ];
     }
 
@@ -307,7 +307,7 @@ class ActiveRecordImage2 extends ActiveRecord
     public function behaviors()
     {
         return [
-            ImageBehave::className(),
+            ImageBehave::class,
         ];
     }
 
