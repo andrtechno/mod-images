@@ -5,8 +5,9 @@ namespace panix\mod\images;
 use Yii;
 use panix\mod\images\models\PlaceHolder;
 use panix\mod\images\models\Image;
+use panix\engine\WebModule;
 
-class Module extends \panix\engine\WebModule {
+class Module extends WebModule {
 
     public $routes = [
         'images/crop' => 'images/default/crop',

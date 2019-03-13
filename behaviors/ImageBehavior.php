@@ -27,8 +27,10 @@ class ImageBehavior extends Behavior {
 
 
     public function afterSave() {
-        $this->updateMainImage();
-        $this->updateImageTitles();
+        if (!Yii::$app instanceof \yii\console\Application) {
+            $this->updateMainImage();
+            $this->updateImageTitles();
+        }
     }
 
     /**
@@ -205,12 +207,15 @@ class ImageBehavior extends Behavior {
             $class = Yii::$app->getModule('images')->className;
             $imageQuery = $class::find();
         }
+
         $finder = $this->getImagesFinder(['is_main' => 1]);
         $imageQuery->where($finder);
         //$imageQuery->orderBy(['is_main' => SORT_DESC, 'id' => SORT_ASC]);
-        $imageQuery->orderBy(['ordern' => SORT_DESC]);
-
+        //$imageQuery->orderBy(['ordern' => SORT_DESC]);
+       //echo $imageQuery->createCommand()->rawSql;
+        //die;
         $img = $imageQuery->one();
+
         if (!$img) {
             return NULL; //Yii::$app->getModule('images')->getPlaceHolder();
         }
@@ -232,7 +237,7 @@ class ImageBehavior extends Behavior {
         $finder = $this->getImagesFinder(['name' => $name]);
         $imageQuery->where($finder);
         //$imageQuery->orderBy(['is_main' => SORT_DESC, 'id' => SORT_ASC]);
-        $imageQuery->orderBy(['ordern' => SORT_DESC]);
+        //$imageQuery->orderBy(['ordern' => SORT_DESC]);
 
         $img = $imageQuery->one();
         if (!$img) {
