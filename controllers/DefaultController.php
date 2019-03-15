@@ -5,6 +5,7 @@ namespace panix\mod\images\controllers;
 use Yii;
 use panix\engine\controllers\WebController;
 use panix\mod\images\models\Image;
+use yii\web\HttpException;
 
 class DefaultController extends WebController {
 
@@ -17,28 +18,38 @@ class DefaultController extends WebController {
         ];
     }
 
-    public function actionGetImage($item = '', $m = '', $dirtyAlias) {
+    public function actionGetFile($item = '', $m = '', $dirtyAlias) {
+
+
+        //if(file_exists(\Yii::$app->getModule('images')->imagesCachePath).DIRECTORY_SEPARATOR.$item.DIRECTORY_SEPARATOR.$m.DIRECTORY_SEPARATOR.$dirtyAlias)){
+
+        //}
+
 
         $dotParts = explode('.', $dirtyAlias);
         if (!isset($dotParts[1])) {
-            throw new \yii\web\HttpException(404, 'Image must have extension');
+            throw new HttpException(404, 'Image must have extension');
         }
         $dirtyAlias = $dotParts[0];
 
         $size = isset(explode('_', $dirtyAlias)[1]) ? explode('_', $dirtyAlias)[1] : false;
         $alias = isset(explode('_', $dirtyAlias)[0]) ? explode('_', $dirtyAlias)[0] : false;
+
+
+
+
         $image = \Yii::$app->getModule('images')->getImage($item, $m, $alias);
 
 
         if ($image && $image->getExtension() != $dotParts[1]) {
-            throw new \yii\web\HttpException(404, 'Image not found (extension)');
+            throw new HttpException(404, 'Image not found (extension)');
         }
 
         if ($image) {
             header('Content-Type: ' . $image->getMimeType($size));
             echo $image->getContent($size);
         } else {
-            throw new \yii\web\HttpException(404, 'There is no images');
+            throw new HttpException(404, 'There is no images');
         }
     }
 

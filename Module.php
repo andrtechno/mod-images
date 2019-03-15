@@ -6,32 +6,66 @@ use Yii;
 use panix\mod\images\models\PlaceHolder;
 use panix\mod\images\models\Image;
 use panix\engine\WebModule;
+use yii\base\BootstrapInterface;
+use yii\web\GroupUrlRule;
 
-class Module extends WebModule {
+class Module extends WebModule implements BootstrapInterface {
 
-    public $routes = [
-        'images/crop' => 'images/default/crop',
-        'images/delete/<id>' => 'images/default/delete',
-        'images/sortable' => 'images/default/sortable',
 
-    ];
     public $imagesStorePath = '@app/web/uploads/store';
     public $imagesCachePath = '@app/web/uploads/cache';
     public $graphicsLibrary = 'GD';
     //public $controllerNamespace = 'panix\mod\images\controllers';
     public $placeHolderPath;
-    public $waterMark = false;
+    //public $waterMark = false;
+    public $waterMark = '@webroot/uploads/watermark-color.png';
     public $className;
-    public $imageCompressionQuality = 85;
+    public $imageCompressionQuality = 100;
     //public $routes = [
     //    'getImage/<item>/<dirtyAlias>' => 'images/default/imageByItemAndAlias',
     //];
+
+
+
+    public function bootstrap($app)
+    {
+
+        $groupUrlRule = new GroupUrlRule([
+            'prefix' => $this->id,
+            'rules' => [
+                //'<controller:(admin|copy|auth)>' => '<controller>',
+                //'<controller:(admin|copy|auth)>/<action:\w+>' => '<controller>/<action>',
+                '<action:[0-9a-zA-Z_\-]+>/<item:\d+>/<m:\w+>/<dirtyAlias:\w.+>' => 'default/<action>',
+            ],
+        ]);
+        $app->getUrlManager()->addRules($groupUrlRule->rules, false);
+
+        /*$app->urlManager->addRules(
+            [
+                '/images/<action:[0-9a-zA-Z_\-]+>/<item:\w+>/<m:\w+>/<dirtyAlias:\w.+>' => 'images/default/<action>',
+                '/images/crop' => 'images/default/crop',
+                '/images/delete/<id>' => 'images/default/delete',
+                '/images/sortable' => 'images/default/sortable',
+
+            ],
+            false
+        );*/
+    }
+
     public function getImage($object_id, $model, $dirtyAlias) {
         //Get params
+
+
+
+
+
+
+
         $params = $data = $this->parseImageAlias($dirtyAlias);
 
         $alias = $params['alias'];
         $size = $params['size'];
+
 
 
         //Lets get image

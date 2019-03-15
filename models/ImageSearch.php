@@ -5,19 +5,20 @@ namespace panix\mod\images\models;
 use Yii;
 use yii\base\Model;
 use panix\engine\data\ActiveDataProvider;
-use panix\mod\images\models\Image;
 
 /**
  * PagesSearch represents the model behind the search form about `app\modules\pages\models\Pages`.
  */
-class ImageSearch extends Image {
+class ImageSearch extends Image
+{
 
     public $exclude = null;
 
     /**
      * @inheritdoc
      */
-    public function rules() {
+    public function rules()
+    {
         return [
             [['id'], 'integer'],
             [['alt_title'], 'safe'],
@@ -27,7 +28,8 @@ class ImageSearch extends Image {
     /**
      * @inheritdoc
      */
-    public function scenarios() {
+    public function scenarios()
+    {
         // bypass scenarios() implementation in the parent class
         return Model::scenarios();
     }
@@ -39,11 +41,12 @@ class ImageSearch extends Image {
      *
      * @return ActiveDataProvider
      */
-    public function search($params, $configure = array()) {
+    public function search($params, $configure = array())
+    {
         $query = Image::find();
         //$query->joinWith('translations');
 
-$query->orderBy(['ordern' => SORT_DESC]);
+        $query->orderBy(['ordern' => SORT_DESC]);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'sort' => self::getSort()

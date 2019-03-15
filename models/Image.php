@@ -17,8 +17,9 @@ use Yii;
 use yii\base\Exception;
 use yii\helpers\Url;
 use yii\helpers\BaseFileHelper;
+use panix\engine\db\ActiveRecord;
 
-class Image extends \panix\engine\db\ActiveRecord {
+class Image extends ActiveRecord {
 
     private $helper = false;
 
@@ -42,7 +43,8 @@ class Image extends \panix\engine\db\ActiveRecord {
     public function getUrl($size = false) {
         $urlSize = ($size) ? '_' . $size : '';
         $url = Url::toRoute([
-                    '/' . Yii::$app->getModule('images')->id . '/get-image',
+           // '/' . Yii::$app->getModule('images')->id . '/get-image',
+            '/images/default/get-file',
                     'item' => $this->object_id,
                     'm' => $this->modelName,
                     //'item' => $this->modelName . $this->object_id,
@@ -139,6 +141,8 @@ class Image extends \panix\engine\db\ActiveRecord {
     }
 
     public function createVersion($imagePath, $sizeString = false) {
+
+
         if (strlen($this->urlAlias) < 1) {
             throw new \Exception('Image without urlAlias!');
         }
@@ -234,6 +238,7 @@ class Image extends \panix\engine\db\ActiveRecord {
 
                 $image->overlay($waterMarkPath, 'bottom right', .5, -10, -10);
             }
+
             $image->toFile($pathToSave, $image->getMimeType(), Yii::$app->getModule('images')->imageCompressionQuality);
             //$image->save($pathToSave, Yii::$app->getModule('images')->imageCompressionQuality);
         }

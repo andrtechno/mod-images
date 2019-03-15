@@ -21,6 +21,7 @@ class ImageBehavior extends Behavior {
         return [
             ActiveRecord::EVENT_AFTER_INSERT => 'afterSave',
             ActiveRecord::EVENT_AFTER_UPDATE => 'afterSave',
+            //ActiveRecord::EVENT_AFTER_FIND=>'test'
 
         ];
     }
