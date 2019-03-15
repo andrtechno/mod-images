@@ -18,7 +18,7 @@ class Module extends WebModule implements BootstrapInterface {
     //public $controllerNamespace = 'panix\mod\images\controllers';
     public $placeHolderPath;
     //public $waterMark = false;
-    public $waterMark = '@webroot/uploads/watermark-color.png';
+    public $waterMark = '@frontend/uploads/watermark-color.png';
     public $className;
     public $imageCompressionQuality = 100;
     //public $routes = [
