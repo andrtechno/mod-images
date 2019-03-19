@@ -95,7 +95,7 @@ class Image extends ActiveRecord {
     }
 
     public function getUrlToOrigin() {
-        $filePath = Yii::getAlias('@web/uploads/store') . DIRECTORY_SEPARATOR . $this->filePath;
+        $filePath = Yii::getAlias('@frontend/uploads/store') . DIRECTORY_SEPARATOR . $this->filePath;
         return $filePath;
     }
 
