@@ -38,7 +38,7 @@ class Module extends WebModule implements BootstrapInterface {
                 '<action:[0-9a-zA-Z_\-]+>/<item:\d+>/<m:\w+>/<dirtyAlias:\w.+>' => 'default/<action>',
             ],
         ]);
-        $app->getUrlManager()->addRules($groupUrlRule->rules, false);
+        $app->getUrlManager()->addRules($groupUrlRule->rules, true);
 
         /*$app->urlManager->addRules(
             [
