@@ -143,6 +143,7 @@ class Image extends ActiveRecord {
     public function createVersion($imagePath, $sizeString = false) {
 
 
+
         if (strlen($this->urlAlias) < 1) {
             throw new \Exception('Image without urlAlias!');
         }
