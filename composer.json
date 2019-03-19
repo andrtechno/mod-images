@@ -7,7 +7,7 @@
     "minimum-stability": "dev",
     "require": {
         "yiisoft/yii2": "*",
-        "abeautifulsite/simpleimage": "3.3.2",
+        "abeautifulsite/simpleimage": "3.3.*",
         "panix/wgt-cropper": "*"
     },
     "require-dev": {
