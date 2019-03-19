@@ -12,8 +12,8 @@ use yii\web\GroupUrlRule;
 class Module extends WebModule implements BootstrapInterface {
 
 
-    public $imagesStorePath = '@app/web/uploads/store';
-    public $imagesCachePath = '@app/web/uploads/cache';
+    public $imagesStorePath = '@frontend/uploads/store';
+    public $imagesCachePath = '@frontend/uploads/cache';
     public $graphicsLibrary = 'GD';
     //public $controllerNamespace = 'panix\mod\images\controllers';
     public $placeHolderPath;
