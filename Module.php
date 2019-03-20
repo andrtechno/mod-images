@@ -9,7 +9,8 @@ use panix\engine\WebModule;
 use yii\base\BootstrapInterface;
 use yii\web\GroupUrlRule;
 
-class Module extends WebModule implements BootstrapInterface {
+class Module extends WebModule implements BootstrapInterface
+{
 
 
     public $imagesStorePath = '@frontend/uploads/store';
@@ -24,7 +25,6 @@ class Module extends WebModule implements BootstrapInterface {
     //public $routes = [
     //    'getImage/<item>/<dirtyAlias>' => 'images/default/imageByItemAndAlias',
     //];
-
 
 
     public function bootstrap($app)
@@ -52,13 +52,9 @@ class Module extends WebModule implements BootstrapInterface {
         );*/
     }
 
-    public function getImage($object_id, $model, $dirtyAlias) {
+    public function getImage($object_id, $model, $dirtyAlias)
+    {
         //Get params
-
-
-
-
-
 
 
         $params = $data = $this->parseImageAlias($dirtyAlias);
@@ -67,27 +63,27 @@ class Module extends WebModule implements BootstrapInterface {
         $size = $params['size'];
 
 
-
         //Lets get image
         if (empty($this->className)) {
             $imageQuery = Image::find();
         } else {
+            /* @var $class Image */
             $class = $this->className;
             $imageQuery = $class::find();
         }
         $image = $imageQuery
-                ->where([
-                    'modelName' => $model,
-                    'object_id' => $object_id,
-                    'urlAlias' => $alias
-                ])
-                /*     ->where('modelName = :modelName AND object_id = :object_id AND urlAlias = :alias',
-                  [
-                  ':modelName' => $modelName,
-                  ':object_id' => $object_id,
-                  ':alias' => $alias
-                  ]) */
-                ->one();
+            ->where([
+                'modelName' => $model,
+                'object_id' => $object_id,
+                'urlAlias' => $alias
+            ])
+            /*     ->where('modelName = :modelName AND object_id = :object_id AND urlAlias = :alias',
+              [
+              ':modelName' => $modelName,
+              ':object_id' => $object_id,
+              ':alias' => $alias
+              ]) */
+            ->one();
         //if (!$image) {
         //    return $this->getPlaceHolder();
         //}
@@ -95,22 +91,26 @@ class Module extends WebModule implements BootstrapInterface {
         return $image;
     }
 
-    public function getStorePath() {
+    public function getStorePath()
+    {
         return Yii::getAlias($this->imagesStorePath);
     }
 
-    public function getCachePath() {
+    public function getCachePath()
+    {
         return Yii::getAlias($this->imagesCachePath);
     }
 
-    public function getModelSubDir($model) {
+    public function getModelSubDir($model)
+    {
 
         $modelName = $this->getShortClass($model);
         $modelDir = \yii\helpers\Inflector::pluralize($modelName) . '/' . $model->id;
         return $modelDir;
     }
 
-    public function getShortClass($obj) {
+    public function getShortClass($obj)
+    {
         $className = get_class($obj);
 
         if (preg_match('@\\\\([\w]+)$@', $className, $matches)) {
@@ -128,13 +128,14 @@ class Module extends WebModule implements BootstrapInterface {
      * @param $notParsedSize
      * @return array|null
      */
-    public function parseSize($notParsedSize) {
+    public function parseSize($notParsedSize)
+    {
         $sizeParts = explode('x', $notParsedSize);
         $part1 = (isset($sizeParts[0]) and $sizeParts[0] != '');
         $part2 = (isset($sizeParts[1]) and $sizeParts[1] != '');
         if ($part1 && $part2) {
             if (intval($sizeParts[0]) > 0 &&
-                    intval($sizeParts[1]) > 0
+                intval($sizeParts[1]) > 0
             ) {
                 $size = [
                     'width' => intval($sizeParts[0]),
@@ -160,7 +161,8 @@ class Module extends WebModule implements BootstrapInterface {
         return $size;
     }
 
-    public function parseImageAlias($parameterized) {
+    public function parseImageAlias($parameterized)
+    {
         $params = explode('_', $parameterized);
 
         if (count($params) == 1) {
@@ -181,20 +183,22 @@ class Module extends WebModule implements BootstrapInterface {
         return ['alias' => $alias, 'size' => $size];
     }
 
-    public function init() {
+    public function init()
+    {
         parent::init();
         if (!$this->imagesStorePath
-                or ! $this->imagesCachePath
-                or
-                $this->imagesStorePath == '@app'
-                or
-                $this->imagesCachePath == '@app'
+            or !$this->imagesCachePath
+            or
+            $this->imagesStorePath == '@app'
+            or
+            $this->imagesCachePath == '@app'
         )
             throw new \Exception('Setup imagesStorePath and imagesCachePath images module properties!!!');
         // custom initialization code goes here
     }
 
-    public function getPlaceHolder() {
+    public function getPlaceHolder()
+    {
 
         if ($this->placeHolderPath) {
             return new PlaceHolder();
