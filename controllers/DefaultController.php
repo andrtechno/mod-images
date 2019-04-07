@@ -115,8 +115,8 @@ class DefaultController extends WebController {
             $image->autoOrient();
 
             /* $image->overlay('uploads/watermark.png', 'top right');
-              $image->text('CORNER CMS 1.1', ['fontFile' => 'uploads/BankGothic RUSS Medium.ttf', 'size' => 30]);
-              $image->text('CORNER CMS 1.2', [
+              $image->text('Pixelion CMS 1.1', ['fontFile' => 'uploads/BankGothic RUSS Medium.ttf', 'size' => 30]);
+              $image->text('Pixelion CMS 1.2', [
               'fontFile' => 'uploads/BankGothic RUSS Medium.ttf',
               'size' => 30,
               'color' => '#ff0000',
