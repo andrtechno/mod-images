@@ -19,11 +19,13 @@ use yii\helpers\Url;
 use yii\helpers\BaseFileHelper;
 use panix\engine\db\ActiveRecord;
 
-class Image extends ActiveRecord {
+class Image extends ActiveRecord
+{
 
     private $helper = false;
 
-    public function clearCache() {
+    public function clearCache()
+    {
         $subDir = $this->getSubDur();
 
         $dirToRemove = Yii::$app->getModule('images')->getCachePath() . DIRECTORY_SEPARATOR . $subDir;
@@ -35,26 +37,29 @@ class Image extends ActiveRecord {
         return true;
     }
 
-    public function getExtension() {
+    public function getExtension()
+    {
         $ext = pathinfo($this->getPathToOrigin(), PATHINFO_EXTENSION);
         return $ext;
     }
 
-    public function getUrl($size = false) {
+    public function getUrl($size = false, $scheme = false)
+    {
         $urlSize = ($size) ? '_' . $size : '';
         $url = Url::toRoute([
-           // '/' . Yii::$app->getModule('images')->id . '/get-image',
+            // '/' . Yii::$app->getModule('images')->id . '/get-image',
             '/images/default/get-file',
-                    'item' => $this->object_id,
-                    'm' => $this->modelName,
-                    //'item' => $this->modelName . $this->object_id,
-                    'dirtyAlias' => $this->urlAlias . $urlSize . '.' . $this->getExtension()
-        ]);
+            'item' => $this->object_id,
+            'm' => $this->modelName,
+            //'item' => $this->modelName . $this->object_id,
+            'dirtyAlias' => $this->urlAlias . $urlSize . '.' . $this->getExtension()
+        ], $scheme);
 
         return $url;
     }
 
-    public static function getSort() {
+    public static function getSort()
+    {
         return new \yii\data\Sort([
             'attributes' => [
                 'alt_title',
@@ -62,7 +67,8 @@ class Image extends ActiveRecord {
         ]);
     }
 
-    public function getPath($size = false) {
+    public function getPath($size = false)
+    {
         $urlSize = ($size) ? '_' . $size : '';
         $base = Yii::$app->getModule('images')->getCachePath();
         $sub = $this->getSubDur();
@@ -70,8 +76,7 @@ class Image extends ActiveRecord {
         $origin = $this->getPathToOrigin();
 
         $filePath = $base . DIRECTORY_SEPARATOR .
-                $sub . DIRECTORY_SEPARATOR . $this->urlAlias . $urlSize . '.' . pathinfo($origin, PATHINFO_EXTENSION);
-        ;
+            $sub . DIRECTORY_SEPARATOR . $this->urlAlias . $urlSize . '.' . pathinfo($origin, PATHINFO_EXTENSION);;
 
         if (!file_exists($filePath)) {
             $this->createVersion($origin, $size);
@@ -84,22 +89,26 @@ class Image extends ActiveRecord {
         return $filePath;
     }
 
-    public function getContent($size = false) {
+    public function getContent($size = false)
+    {
         return file_get_contents($this->getPath($size));
     }
 
-    public function getPathToOrigin() {
+    public function getPathToOrigin()
+    {
         $base = Yii::$app->getModule('images')->getStorePath();
         $filePath = $base . DIRECTORY_SEPARATOR . $this->filePath;
         return $filePath;
     }
 
-    public function getUrlToOrigin() {
+    public function getUrlToOrigin()
+    {
         $filePath = Yii::getAlias('@frontend/uploads/store') . DIRECTORY_SEPARATOR . $this->filePath;
         return $filePath;
     }
 
-    public function getSizes() {
+    public function getSizes()
+    {
         $sizes = false;
         if (Yii::$app->getModule('images')->graphicsLibrary == 'Imagick') {
             $image = new \Imagick($this->getPathToOrigin());
@@ -113,13 +122,13 @@ class Image extends ActiveRecord {
         return $sizes;
     }
 
-    public function getSizesWhen($sizeString) {
+    public function getSizesWhen($sizeString)
+    {
 
         $size = Yii::$app->getModule('images')->parseSize($sizeString);
         if (!$size) {
             throw new \Exception('Bad size..');
         }
-
 
 
         $sizes = $this->getSizes();
@@ -140,8 +149,8 @@ class Image extends ActiveRecord {
         return $newSizes;
     }
 
-    public function createVersion($imagePath, $sizeString = false) {
-
+    public function createVersion($imagePath, $sizeString = false)
+    {
 
 
         if (strlen($this->urlAlias) < 1) {
@@ -223,9 +232,9 @@ class Image extends ActiveRecord {
                 if ($waterMark->getHeight() > $wmMaxHeight or $waterMark->getWidth() > $wmMaxWidth) {
 
                     $waterMarkPath = Yii::$app->getModule('images')->getCachePath() . DIRECTORY_SEPARATOR .
-                            pathinfo(Yii::$app->getModule('images')->waterMark)['filename'] .
-                            $wmMaxWidth . 'x' . $wmMaxHeight . '.' .
-                            pathinfo(Yii::$app->getModule('images')->waterMark)['extension'];
+                        pathinfo(Yii::$app->getModule('images')->waterMark)['filename'] .
+                        $wmMaxWidth . 'x' . $wmMaxHeight . '.' .
+                        pathinfo(Yii::$app->getModule('images')->waterMark)['extension'];
 
                     //throw new Exception($waterMarkPath);
                     if (!file_exists($waterMarkPath)) {
@@ -247,7 +256,8 @@ class Image extends ActiveRecord {
         return $image;
     }
 
-    public function setMain($is_main = true) {
+    public function setMain($is_main = true)
+    {
         if ($is_main) {
             $this->is_main = 1;
         } else {
@@ -255,25 +265,29 @@ class Image extends ActiveRecord {
         }
     }
 
-    public function getMimeType($size = false) {
+    public function getMimeType($size = false)
+    {
         return image_type_to_mime_type(exif_imagetype($this->getPath($size)));
     }
 
-    protected function getSubDur() {
+    protected function getSubDur()
+    {
         return \yii\helpers\Inflector::pluralize($this->modelName) . '/' . $this->object_id;
     }
 
     /**
      * @inheritdoc
      */
-    public static function tableName() {
+    public static function tableName()
+    {
         return '{{%image}}';
     }
 
     /**
      * @inheritdoc
      */
-    public function rules() {
+    public function rules()
+    {
         return [
             [['filePath', 'object_id', 'modelName', 'urlAlias'], 'required'],
             [['object_id', 'is_main'], 'integer'],
@@ -286,7 +300,8 @@ class Image extends ActiveRecord {
     /**
      * @inheritdoc
      */
-    public function attributeLabels() {
+    public function attributeLabels()
+    {
         return [
             'id' => 'ID',
             'filePath' => 'File Path',
@@ -297,7 +312,8 @@ class Image extends ActiveRecord {
         ];
     }
 
-    public function afterDelete() {
+    public function afterDelete()
+    {
         $this->clearCache();
         $storePath = Yii::$app->getModule('images')->getStorePath();
 
