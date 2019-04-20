@@ -43,7 +43,7 @@ class Image extends ActiveRecord
         return $ext;
     }
 
-    public function getUrl($size = false, $scheme = false)
+    public function getUrl($size = false)
     {
         $urlSize = ($size) ? '_' . $size : '';
         $url = Url::toRoute([
@@ -53,7 +53,7 @@ class Image extends ActiveRecord
             'm' => $this->modelName,
             //'item' => $this->modelName . $this->object_id,
             'dirtyAlias' => $this->urlAlias . $urlSize . '.' . $this->getExtension()
-        ], $scheme);
+        ]);
 
         return $url;
     }
@@ -76,15 +76,16 @@ class Image extends ActiveRecord
         $origin = $this->getPathToOrigin();
 
         $filePath = $base . DIRECTORY_SEPARATOR .
-            $sub . DIRECTORY_SEPARATOR . $this->urlAlias . $urlSize . '.' . pathinfo($origin, PATHINFO_EXTENSION);;
+            $sub . DIRECTORY_SEPARATOR . $this->urlAlias . $urlSize . '.' . pathinfo($origin, PATHINFO_EXTENSION);
 
-        if (!file_exists($filePath)) {
+
+
+       // if (!file_exists($filePath)) {
             $this->createVersion($origin, $size);
-
             if (!file_exists($filePath)) {
                 throw new \Exception('Problem with image creating.');
             }
-        }
+       // }
 
         return $filePath;
     }
@@ -103,7 +104,7 @@ class Image extends ActiveRecord
 
     public function getUrlToOrigin()
     {
-        $filePath = Yii::getAlias('@frontend/uploads/store') . DIRECTORY_SEPARATOR . $this->filePath;
+        $filePath = Yii::getAlias('@uploads/store') . DIRECTORY_SEPARATOR . $this->filePath;
         return $filePath;
     }
 
@@ -151,6 +152,20 @@ class Image extends ActiveRecord
 
     public function createVersion($imagePath, $sizeString = false)
     {
+
+        $sizes = explode('x', $sizeString);
+
+        /** @var $img \panix\engine\components\ImageHandler */
+        $img = Yii::$app->img;
+        $img->load($imagePath);
+
+        if ($sizes) {
+            $img->resize((!empty($sizes[0])) ? $sizes[0] : 0, (!empty($sizes[1])) ? $sizes[1] : 0);
+        }
+
+        $img->show();
+
+        Yii::$app->end();
 
 
         if (strlen($this->urlAlias) < 1) {
@@ -252,6 +267,7 @@ class Image extends ActiveRecord
             $image->toFile($pathToSave, $image->getMimeType(), Yii::$app->getModule('images')->imageCompressionQuality);
             //$image->save($pathToSave, Yii::$app->getModule('images')->imageCompressionQuality);
         }
+
 
         return $image;
     }

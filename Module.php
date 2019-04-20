@@ -13,8 +13,8 @@ class Module extends WebModule implements BootstrapInterface
 {
 
 
-    public $imagesStorePath = '@frontend/uploads/store';
-    public $imagesCachePath = '@frontend/uploads/cache';
+    public $imagesStorePath = '@uploads/store';
+    public $imagesCachePath = '@uploads/cache';
     public $graphicsLibrary = 'GD';
     //public $controllerNamespace = 'panix\mod\images\controllers';
     public $placeHolderPath;
@@ -35,6 +35,7 @@ class Module extends WebModule implements BootstrapInterface
             'rules' => [
                 //'<controller:(admin|copy|auth)>' => '<controller>',
                 //'<controller:(admin|copy|auth)>/<action:\w+>' => '<controller>/<action>',
+                'logo' => 'default/logo',
                 '<action:[0-9a-zA-Z_\-]+>/<item:\d+>/<m:\w+>/<dirtyAlias:\w.+>' => 'default/<action>',
             ],
         ]);
@@ -52,6 +53,12 @@ class Module extends WebModule implements BootstrapInterface
         );*/
     }
 
+    /**
+     * @param $object_id
+     * @param $model
+     * @param $dirtyAlias
+     * @return array|null|\yii\db\ActiveRecord
+     */
     public function getImage($object_id, $model, $dirtyAlias)
     {
         //Get params
