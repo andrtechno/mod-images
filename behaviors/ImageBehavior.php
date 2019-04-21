@@ -178,6 +178,7 @@ class ImageBehavior extends Behavior {
      * @return array|yii\db\ActiveRecord[]
      */
     public function getImages($additionWhere = false) {
+
         $finder = $this->getImagesFinder($additionWhere);
 
         if (Yii::$app->getModule('images')->className === null) {
