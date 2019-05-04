@@ -13,6 +13,7 @@ class DefaultController extends WebController {
             'sortable' => [
                 'class' => \panix\engine\grid\sortable\Action::class,
                 'modelClass' => Image::class,
+                'successMessage' => Yii::t('shop/admin', 'SORT_IMAGE_SUCCESS_MESSAGE')
             ],
         ];
     }
