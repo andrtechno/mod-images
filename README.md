@@ -116,7 +116,7 @@ Installation
     </pre>
 2. run 
     <pre>
-      php composer.phar update
+      php composer update
     </pre>
 
 3. run migrate
