@@ -1,17 +1,14 @@
 <?php
 
-use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 
 \panix\ext\cropper\Cropper::widget();
 
-$form = ActiveForm::begin([
-    'id' => 'cropper-form',
-    'action' => '/admin/images/default/crop',
-    // 'enableAjaxValidation' => true,
-]);
 
-echo Html::beginForm(['/admin/images/default/crop'], 'post', ['enctype' => 'multipart/form-data']);
+echo Html::beginForm(['/admin/images/default/crop'], 'post', [
+    'enctype' => 'multipart/form-data',
+    'id' => 'cropper-form',
+]);
 
 $model = new panix\ext\cropper\CropperForm();
 
