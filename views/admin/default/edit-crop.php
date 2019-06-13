@@ -39,31 +39,21 @@ $model = new panix\ext\cropper\CropperForm();
             <div class="docs-data">
 
 
-                <?= Html::activeHiddenInput($model,'filepath',['value'=> $image->getPathToOrigin()]); ?>
+                <?= Html::activeHiddenInput($model, 'filepath', ['value' => $image->getPathToOrigin()]); ?>
                 <div class="input-group input-group-sm mt-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text"><?= Html::activeLabel($model,'coord_x'); ?></span>
+                        <span class="input-group-text"><?= Html::activeLabel($model, 'coord_x'); ?></span>
                     </div>
-                    <?= Html::activeTextInput($model,'coord_x',['class'=>'form-control']); ?>
+                    <?= Html::activeTextInput($model, 'coord_x', ['class' => 'form-control']); ?>
                     <div class="input-group-append">
                         <span class="input-group-text">px</span>
                     </div>
                 </div>
                 <div class="input-group input-group-sm mt-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text"><?= Html::activeLabel($model,'coord_y'); ?></span>
+                        <span class="input-group-text"><?= Html::activeLabel($model, 'coord_y'); ?></span>
                     </div>
-                    <?= Html::activeTextInput($model,'coord_y',['class'=>'form-control']); ?>
-                    <div class="input-group-append">
-                        <span class="input-group-text">px</span>
-                    </div>
-                </div>
-
-                <div class="input-group input-group-sm mt-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><?= Html::activeLabel($model,'width'); ?></span>
-                    </div>
-                    <?= Html::activeTextInput($model,'width',['class'=>'form-control']); ?>
+                    <?= Html::activeTextInput($model, 'coord_y', ['class' => 'form-control']); ?>
                     <div class="input-group-append">
                         <span class="input-group-text">px</span>
                     </div>
@@ -71,9 +61,9 @@ $model = new panix\ext\cropper\CropperForm();
 
                 <div class="input-group input-group-sm mt-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text"><?= Html::activeLabel($model,'height'); ?></span>
+                        <span class="input-group-text"><?= Html::activeLabel($model, 'width'); ?></span>
                     </div>
-                    <?= Html::activeTextInput($model,'height',['class'=>'form-control']); ?>
+                    <?= Html::activeTextInput($model, 'width', ['class' => 'form-control']); ?>
                     <div class="input-group-append">
                         <span class="input-group-text">px</span>
                     </div>
@@ -81,9 +71,19 @@ $model = new panix\ext\cropper\CropperForm();
 
                 <div class="input-group input-group-sm mt-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text"><?= Html::activeLabel($model,'rotate'); ?></span>
+                        <span class="input-group-text"><?= Html::activeLabel($model, 'height'); ?></span>
                     </div>
-                    <?= Html::activeTextInput($model,'height',['class'=>'form-control']); ?>
+                    <?= Html::activeTextInput($model, 'height', ['class' => 'form-control']); ?>
+                    <div class="input-group-append">
+                        <span class="input-group-text">px</span>
+                    </div>
+                </div>
+
+                <div class="input-group input-group-sm mt-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><?= Html::activeLabel($model, 'rotate'); ?></span>
+                    </div>
+                    <?= Html::activeTextInput($model, 'height', ['class' => 'form-control']); ?>
                     <div class="input-group-append">
                         <span class="input-group-text">deg</span>
                     </div>
@@ -92,16 +92,16 @@ $model = new panix\ext\cropper\CropperForm();
 
                 <div class="input-group input-group-sm mt-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text"><?= Html::activeLabel($model,'scaleX'); ?></span>
+                        <span class="input-group-text"><?= Html::activeLabel($model, 'scaleX'); ?></span>
                     </div>
-                    <?= Html::activeTextInput($model,'scaleX',['class'=>'form-control']); ?>
+                    <?= Html::activeTextInput($model, 'scaleX', ['class' => 'form-control']); ?>
                 </div>
 
                 <div class="input-group input-group-sm mt-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text"><?= Html::activeLabel($model,'scaleY'); ?></span>
+                        <span class="input-group-text"><?= Html::activeLabel($model, 'scaleY'); ?></span>
                     </div>
-                    <?= Html::activeTextInput($model,'scaleY',['class'=>'form-control']); ?>
+                    <?= Html::activeTextInput($model, 'scaleY', ['class' => 'form-control']); ?>
                 </div>
 
 
@@ -446,124 +446,160 @@ $model = new panix\ext\cropper\CropperForm();
                     Toggle Options
                     <span class="caret"></span>
                 </button>
-                <ul class="dropdown-menu" aria-labelledby="toggleOptions" role="menu">
-                    <li class="form-check" role="presentation">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="responsive" checked>
-                            responsive
-                        </label>
-                    </li>
-                    <li class="form-check" role="presentation">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="restore" checked>
-                            restore
-                        </label>
-                    </li>
-                    <li class="form-check" role="presentation">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="checkCrossOrigin" checked>
-                            checkCrossOrigin
-                        </label>
-                    </li>
-                    <li class="form-check" role="presentation">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="checkOrientation" checked>
-                            checkOrientation
-                        </label>
-                    </li>
-
-                    <li class="form-check" role="presentation">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="modal" checked>
-                            modal
-                        </label>
-                    </li>
-                    <li class="form-check" role="presentation">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="guides" checked>
-                            guides
-                        </label>
-                    </li>
-                    <li class="form-check" role="presentation">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="center" checked>
-                            center
-                        </label>
-                    </li>
-                    <li class="form-check" role="presentation">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="highlight" checked>
-                            highlight
-                        </label>
-                    </li>
-                    <li class="form-check" role="presentation">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="background" checked>
-                            background
-                        </label>
-                    </li>
-
-                    <li class="form-check" role="presentation">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="autoCrop" checked>
-                            autoCrop
-                        </label>
-                    </li>
-                    <li class="form-check" role="presentation">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="movable" checked>
-                            movable
-                        </label>
-                    </li>
-                    <li class="form-check" role="presentation">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="rotatable" checked>
-                            rotatable
-                        </label>
-                    </li>
-                    <li class="form-check" role="presentation">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="scalable" checked>
-                            scalable
-                        </label>
-                    </li>
-                    <li class="form-check" role="presentation">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="zoomable" checked>
-                            zoomable
-                        </label>
-                    </li>
-                    <li class="form-check" role="presentation">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="zoomOnTouch" checked>
-                            zoomOnTouch
-                        </label>
-                    </li>
-                    <li class="form-check" role="presentation">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="zoomOnWheel" checked>
-                            zoomOnWheel
-                        </label>
-                    </li>
-                    <li class="form-check" role="presentation">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="cropBoxMovable" checked>
-                            cropBoxMovable
-                        </label>
-                    </li>
-                    <li class="form-check" role="presentation">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="cropBoxResizable" checked>
-                            cropBoxResizable
-                        </label>
-                    </li>
-                    <li class="form-check" role="presentation">
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="checkbox" name="toggleDragModeOnDblclick" checked>
-                            toggleDragModeOnDblclick
-                        </label>
-                    </li>
-                </ul>
+                <div class="dropdown-menu" aria-labelledby="toggleOptions" role="menu">
+                    <div class="dropdown-item">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" name="responsive" checked>
+                                responsive
+                            </label>
+                        </div>
+                    </div>
+                    <div class="dropdown-item">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" name="restore" checked>
+                                restore
+                            </label>
+                        </div>
+                    </div>
+                    <div class="dropdown-item">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" name="checkCrossOrigin" checked>
+                                checkCrossOrigin
+                            </label>
+                        </div>
+                    </div>
+                    <div class="dropdown-item">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" name="checkOrientation" checked>
+                                checkOrientation
+                            </label>
+                        </div>
+                    </div>
+                    <div class="dropdown-item">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" name="modal" checked>
+                                modal
+                            </label>
+                        </div>
+                    </div>
+                    <div class="dropdown-item">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" name="guides" checked>
+                                guides
+                            </label>
+                        </div>
+                    </div>
+                    <div class="dropdown-item">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" name="center" checked>
+                                center
+                            </label>
+                        </div>
+                    </div>
+                    <div class="dropdown-item">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" name="highlight" checked>
+                                highlight
+                            </label>
+                        </div>
+                    </div>
+                    <div class="dropdown-item">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" name="background" checked>
+                                background
+                            </label>
+                        </div>
+                    </div>
+                    <div class="dropdown-item">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" name="autoCrop" checked>
+                                autoCrop
+                            </label>
+                        </div>
+                    </div>
+                    <div class="dropdown-item">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" name="movable" checked>
+                                movable
+                            </label>
+                        </div>
+                    </div>
+                    <div class="dropdown-item">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" name="rotatable" checked>
+                                rotatable
+                            </label>
+                        </div>
+                    </div>
+                    <div class="dropdown-item">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" name="scalable" checked>
+                                scalable
+                            </label>
+                        </div>
+                    </div>
+                    <div class="dropdown-item">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" name="zoomable" checked>
+                                zoomable
+                            </label>
+                        </div>
+                    </div>
+                    <div class="dropdown-item">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" name="zoomOnTouch" checked>
+                                zoomOnTouch
+                            </label>
+                        </div>
+                    </div>
+                    <div class="dropdown-item">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" name="zoomOnWheel" checked>
+                                zoomOnWheel
+                            </label>
+                        </div>
+                    </div>
+                    <div class="dropdown-item">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" name="cropBoxMovable" checked>
+                                cropBoxMovable
+                            </label>
+                        </div>
+                    </div>
+                    <div class="dropdown-item">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" name="cropBoxResizable" checked>
+                                cropBoxResizable
+                            </label>
+                        </div>
+                    </div>
+                    <div class="dropdown-item">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" name="toggleDragModeOnDblclick" checked>
+                                toggleDragModeOnDblclick
+                            </label>
+                        </div>
+                    </div>
+                </div>
             </div><!-- /.dropdown -->
 
         </div><!-- /.docs-toggles -->
