@@ -108,6 +108,13 @@ class Image extends ActiveRecord
         return $filePath;
     }
 
+    public function getUrlToOrigin2()
+    {
+        $base = '/uploads/store/'.$this->filePath;
+        $filePath = $base;
+        return $filePath;
+    }
+
     public function getSizes()
     {
         $sizes = false;

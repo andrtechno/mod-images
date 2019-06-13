@@ -83,7 +83,7 @@ class DefaultController extends WebController {
 
     public function actionEditCrop($id) {
         $entry = Image::find()
-                ->where(['id' => Yii::$app->request->get('id')])
+                ->where(['id' => $id])
                 ->one();
         if (Yii::$app->request->isAjax) {
             return $this->renderAjax('edit-crop', ['image' => $entry]);
