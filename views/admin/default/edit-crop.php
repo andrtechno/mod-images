@@ -11,12 +11,8 @@ $form = ActiveForm::begin([
     // 'enableAjaxValidation' => true,
 ]);
 
+echo Html::beginForm(['/admin/images/default/crop'], 'post', ['enctype' => 'multipart/form-data']);
 
-//  print_r($image->getPathToOrigin());die;
-?>
-
-
-<?php
 $model = new panix\ext\cropper\CropperForm();
 
 
@@ -39,31 +35,73 @@ $model = new panix\ext\cropper\CropperForm();
                 <div class="img-preview preview-xs"></div>
             </div>
 
-            <!-- <h3>Data:</h3> -->
+            <h3>Data:</h3>
             <div class="docs-data">
-                <div class="input-group input-group-sm">
-                    <?= $form->field($model, 'filepath')->hiddenInput(['value' => $image->getPathToOrigin()])->label(false) ?>
+
+
+                <?= Html::activeHiddenInput($model,'filepath',['value'=> $image->getPathToOrigin()]); ?>
+                <div class="input-group input-group-sm mt-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><?= Html::activeLabel($model,'coord_x'); ?></span>
+                    </div>
+                    <?= Html::activeTextInput($model,'coord_x',['class'=>'form-control']); ?>
+                    <div class="input-group-append">
+                        <span class="input-group-text">px</span>
+                    </div>
                 </div>
-                <div class="input-group input-group-sm">
-                    <?= $form->field($model, 'coord_x') ?>
+                <div class="input-group input-group-sm mt-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><?= Html::activeLabel($model,'coord_y'); ?></span>
+                    </div>
+                    <?= Html::activeTextInput($model,'coord_y',['class'=>'form-control']); ?>
+                    <div class="input-group-append">
+                        <span class="input-group-text">px</span>
+                    </div>
                 </div>
-                <div class="input-group input-group-sm">
-                    <?= $form->field($model, 'coord_y') ?>
+
+                <div class="input-group input-group-sm mt-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><?= Html::activeLabel($model,'width'); ?></span>
+                    </div>
+                    <?= Html::activeTextInput($model,'width',['class'=>'form-control']); ?>
+                    <div class="input-group-append">
+                        <span class="input-group-text">px</span>
+                    </div>
                 </div>
-                <div class="input-group input-group-sm">
-                    <?= $form->field($model, 'width') ?>
+
+                <div class="input-group input-group-sm mt-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><?= Html::activeLabel($model,'height'); ?></span>
+                    </div>
+                    <?= Html::activeTextInput($model,'height',['class'=>'form-control']); ?>
+                    <div class="input-group-append">
+                        <span class="input-group-text">px</span>
+                    </div>
                 </div>
-                <div class="input-group input-group-sm">
-                    <?= $form->field($model, 'height') ?>
+
+                <div class="input-group input-group-sm mt-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><?= Html::activeLabel($model,'rotate'); ?></span>
+                    </div>
+                    <?= Html::activeTextInput($model,'height',['class'=>'form-control']); ?>
+                    <div class="input-group-append">
+                        <span class="input-group-text">deg</span>
+                    </div>
                 </div>
-                <div class="input-group input-group-sm">
-                    <?= $form->field($model, 'rotate') ?>
+
+
+                <div class="input-group input-group-sm mt-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><?= Html::activeLabel($model,'scaleX'); ?></span>
+                    </div>
+                    <?= Html::activeTextInput($model,'scaleX',['class'=>'form-control']); ?>
                 </div>
-                <div class="input-group input-group-sm">
-                    <?= $form->field($model, 'scaleX') ?>
-                </div>
-                <div class="input-group input-group-sm">
-                    <?= $form->field($model, 'scaleY') ?>
+
+                <div class="input-group input-group-sm mt-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><?= Html::activeLabel($model,'scaleY'); ?></span>
+                    </div>
+                    <?= Html::activeTextInput($model,'scaleY',['class'=>'form-control']); ?>
                 </div>
 
 
@@ -72,7 +110,6 @@ $model = new panix\ext\cropper\CropperForm();
     </div>
     <div class="row">
         <div class="col-md-9 docs-buttons">
-            <?php echo Html::button('das', ['class' => 'btn btn-primary']); ?>
             <!-- <h3>Toolbar:</h3> -->
             <div class="btn-group btn-group-sm">
                 <button type="button" class="btn btn-outline-secondary" data-method="setDragMode" data-option="move"
@@ -95,16 +132,12 @@ $model = new panix\ext\cropper\CropperForm();
                 <button type="button" class="btn btn-outline-secondary" data-method="zoom" data-option="0.1"
                         title="Zoom In">
                             <span class="docs-tooltip" data-toggle="tooltip" data-animation="false"
-                                  title="$().cropper(&quot;zoom&quot;, 0.1)">
-                                +
-                            </span>
+                                  title="Zoom plus">+</span>
                 </button>
                 <button type="button" class="btn btn-outline-secondary" data-method="zoom" data-option="-0.1"
                         title="Zoom Out">
                             <span class="docs-tooltip" data-toggle="tooltip" data-animation="false"
-                                  title="$().cropper(&quot;zoom&quot;, -0.1)">
-                                -
-                            </span>
+                                  title="Zoom minus">-</span>
                 </button>
             </div>
 
@@ -208,7 +241,7 @@ $model = new panix\ext\cropper\CropperForm();
             <div class="btn-group btn-group-sm">
                 <button type="button" class="btn btn-outline-primary" data-method="reset" title="Reset">
                             <span class="docs-tooltip" data-toggle="tooltip" data-animation="false"
-                                  title="$().cropper(&quot;reset&quot;)">
+                                  title="Reset">
                                 <span class="icon-refresh"></span>
                             </span>
                 </button>
@@ -222,8 +255,8 @@ $model = new panix\ext\cropper\CropperForm();
                 </label>
                 <button type="button" class="btn btn-outline-primary" data-method="destroy" title="Destroy">
                             <span class="docs-tooltip" data-toggle="tooltip" data-animation="false"
-                                  title="$().cropper(&quot;destroy&quot;)">
-                                <span class="fa fa-power-off"></span>
+                                  title="Destroy">
+                                <span class="icon-trashcan"></span>
                             </span>
                 </button>
             </div>
@@ -231,22 +264,20 @@ $model = new panix\ext\cropper\CropperForm();
             <div class="btn-group btn-group-sm btn-group-crop">
                 <button type="button" class="btn btn-outline-primary" data-method="getCroppedCanvas">
                             <span class="docs-tooltip" data-toggle="tooltip" data-animation="false"
-                                  title="$().cropper(&quot;getCroppedCanvas&quot;)">
+                                  title="getCroppedCanvas">
                                 Get Cropped Canvas
                             </span>
                 </button>
                 <button type="button" class="btn btn-outline-primary" data-method="getCroppedCanvas"
                         data-option="{ &quot;width&quot;: 160, &quot;height&quot;: 90 }">
                             <span class="docs-tooltip" data-toggle="tooltip" data-animation="false"
-                                  title="$().cropper(&quot;getCroppedCanvas&quot;, { width: 160, height: 90 })">
-                                160&times;90
+                                  title="getCroppedCanvas 160&times;90">160&times;90
                             </span>
                 </button>
                 <button type="button" class="btn btn-outline-primary" data-method="getCroppedCanvas"
                         data-option="{ &quot;width&quot;: 320, &quot;height&quot;: 180 }">
                             <span class="docs-tooltip" data-toggle="tooltip" data-animation="false"
-                                  title="$().cropper(&quot;getCroppedCanvas&quot;, { width: 320, height: 180 })">
-                                320&times;180
+                                  title="getCroppedCanvas 320&times;180">320&times;180
                             </span>
                 </button>
             </div>
@@ -580,5 +611,4 @@ $this->registerJs("
 ?>
 
 
-
-<?php ActiveForm::end(); ?>
+<?php Html::endForm(); ?>
