@@ -9,6 +9,10 @@ use panix\engine\WebModule;
 use yii\base\BootstrapInterface;
 use yii\web\GroupUrlRule;
 
+/**
+ * Class Module
+ * @property string $imagesStorePath
+ */
 class Module extends WebModule implements BootstrapInterface
 {
 

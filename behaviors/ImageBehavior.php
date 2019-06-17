@@ -327,7 +327,7 @@ class ImageBehavior extends Behavior {
      * Обновить алиасы для картинок
      * Зачистить кэш
      */
-    private function getAlias() {
+    public function getAlias() {
         $aliasWords = $this->getAliasString();
         $imagesCount = count($this->owner->getImages());
 

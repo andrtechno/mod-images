@@ -1,15 +1,5 @@
 <?php
 
-/**
- * This is the model class for table "image".
- *
- * @property integer $id
- * @property string $filePath
- * @property integer $object_id
- * @property integer $is_main
- * @property string $modelName
- * @property string $urlAlias
- */
 
 namespace panix\mod\images\models;
 
@@ -19,6 +9,17 @@ use yii\helpers\Url;
 use yii\helpers\BaseFileHelper;
 use panix\engine\db\ActiveRecord;
 
+/**
+ * This is the model class for table "image".
+ *
+ * @property integer $id
+ * @property string $filePath
+ * @property integer $object_id
+ * @property integer $is_main
+ * @property string $modelName
+ * @property string $urlAlias
+ * @property string $alt_title
+ */
 class Image extends ActiveRecord
 {
 
@@ -79,13 +80,12 @@ class Image extends ActiveRecord
             $sub . DIRECTORY_SEPARATOR . $this->urlAlias . $urlSize . '.' . pathinfo($origin, PATHINFO_EXTENSION);
 
 
-
-       // if (!file_exists($filePath)) {
-            $this->createVersion($origin, $size);
-            if (!file_exists($filePath)) {
-                throw new \Exception('Problem with image creating.');
-            }
-       // }
+        // if (!file_exists($filePath)) {
+        $this->createVersion($origin, $size);
+        if (!file_exists($filePath)) {
+            throw new \Exception('Problem with image creating.');
+        }
+        // }
 
         return $filePath;
     }
@@ -110,7 +110,7 @@ class Image extends ActiveRecord
 
     public function getUrlToOrigin2()
     {
-        $base = '/uploads/store/'.$this->filePath;
+        $base = '/uploads/store/' . $this->filePath;
         $filePath = $base;
         return $filePath;
     }
