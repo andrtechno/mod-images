@@ -85,6 +85,7 @@ class DefaultController extends WebController {
         $entry = Image::find()
                 ->where(['id' => $id])
                 ->one();
+        \panix\ext\cropper\CropperAsset::register($this->view);
         if (Yii::$app->request->isAjax) {
             return $this->renderAjax('edit-crop', ['image' => $entry]);
         } else {

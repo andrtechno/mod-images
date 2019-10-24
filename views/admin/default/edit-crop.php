@@ -2,9 +2,6 @@
 
 use yii\helpers\Html;
 
-\panix\ext\cropper\Cropper::widget();
-
-
 echo Html::beginForm(['/admin/images/default/crop'], 'post', [
     'enctype' => 'multipart/form-data',
     'id' => 'cropper-form',
