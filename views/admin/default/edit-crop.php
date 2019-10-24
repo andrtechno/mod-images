@@ -17,7 +17,7 @@ $model = new panix\ext\cropper\CropperForm();
         <div class="col-md-9">
             <!-- <h3>Demo:</h3> -->
             <div class="img-container">
-                <img id="image" src="<?= $image->getUrlToOrigin2() ?>" alt="Picture">
+                <img id="image" class="img-fluid" src="<?= $image->getUrlToOrigin2() ?>" alt="Picture">
             </div>
         </div>
         <div class="col-md-3">
