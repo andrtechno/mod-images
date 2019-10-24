@@ -3,18 +3,16 @@
 namespace panix\mod\images\controllers;
 
 use Yii;
-use panix\engine\controllers\WebController;
-use panix\mod\images\models\Image;
 use yii\web\Controller;
 use yii\web\HttpException;
-use yii\web\Response;
+use panix\mod\images\models\Image;
 
 class DefaultController extends Controller {
 
     public function actions() {
         return [
             'sortable' => [
-                'class' => \panix\engine\grid\sortable\Action::class,
+                'class' => 'panix\engine\grid\sortable\Action',
                 'modelClass' => Image::class,
             ],
         ];
@@ -24,8 +22,7 @@ class DefaultController extends Controller {
 
         Header('Content-type: text/xml');
         echo '<?xml version="1.0" encoding="utf-8"?>
-<svg xmlns="http://www.w3.org/2000/svg"
-	 preserveAspectRatio="xMinYMin meet" viewBox="0 0 150 150" fill="red">
+<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" fill="red">
 <style type="text/css">
 	.st2{fill:#F8E07A;}
 	.st3{fill:#505759;}
@@ -45,7 +42,37 @@ class DefaultController extends Controller {
 </svg>';
         die;
     }
-    public function actionGetFile($item = '', $m = '', $dirtyAlias) {
+    public function actionGetFile($dirtyAlias) {
+
+        $dotParts = explode('.', $dirtyAlias);
+        if (!isset($dotParts[1])) {
+            throw new HttpException(404, 'Image must have extension');
+        }
+        $dirtyAlias = $dotParts[0];
+
+        $size = isset(explode('_', $dirtyAlias)[1]) ? explode('_', $dirtyAlias)[1] : false;
+        $alias = isset(explode('_', $dirtyAlias)[0]) ? explode('_', $dirtyAlias)[0] : false;
+
+
+
+        /** @var $image Image */
+        $image = \Yii::$app->getModule('images')->getImage($alias);
+
+
+
+        if ($image && $image->getExtension() != $dotParts[1]) {
+            throw new HttpException(404, 'Image not found (extension)');
+        }
+
+        if ($image) {
+            $image->getContent($size);
+        } else {
+            throw new HttpException(404, 'There is no images');
+        }
+    }
+
+
+    public function actionGetFile__OLD($item = '', $m = '', $dirtyAlias) {
 
 
         //if(file_exists(\Yii::$app->getModule('images')->imagesCachePath).DIRECTORY_SEPARATOR.$item.DIRECTORY_SEPARATOR.$m.DIRECTORY_SEPARATOR.$dirtyAlias)){
@@ -138,7 +165,7 @@ class DefaultController extends Controller {
 
         try {
             // Create a new SimpleImage object
-            $image = new \claviska\SimpleImage($form['filepath']);
+            $image = new \claviska\SimpleImage(Yii::getAlias('@uploads/new-image.jpg'));//$form['filepath']
 
             $image->autoOrient();
 
@@ -176,14 +203,18 @@ class DefaultController extends Controller {
               ['x' => 600, 'y' => 1000],
               ['x' => 50, 'y' => 50]
               ], '#ff0000', 'filled') */
-            //->blur('gaussian',5) //very slow load 
+
             //->thumbnail(200,200,'top')
             // ->resize(520)
-            //->darken(40)
-            //->desaturate()//grayscale
+            $image->desaturate();//grayscale
+
             //$image->contrast(30);
-            $image->toFile('uploads/new-image.jpg', 'image/png');      // convert to PNG and save a copy to new-image.png
-            $image->toString();                               // output to the screen
+            //$image->blur('gaussian',5); //very slow load
+            //$image->darken(50);
+            $image->border('#ff0000',5);
+            $image->toFile('uploads/new-image1.jpg', 'image/png');      // convert to PNG and save a copy to new-image.png
+            //$image->toString(); // output to the screen
+            $image->toScreen();
             // And much more! 💪
         } catch (Exception $err) {
             // Handle errors

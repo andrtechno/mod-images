@@ -38,9 +38,10 @@ class Module extends WebModule implements BootstrapInterface
             'prefix' => $this->id,
             'rules' => [
                 //'<controller:(admin|copy|auth)>' => '<controller>',
-                //'<controller:(admin|copy|auth)>/<action:\w+>' => '<controller>/<action>',
-                'logo' => 'default/logo',
-                '<action:[0-9a-zA-Z_\-]+>/<item:\d+>/<m:\w+>/<dirtyAlias:\w.+>' => 'default/<action>',
+                '<action:(crop|logo)>' => 'default/<action>',
+               // 'logo' => 'default/logo',
+                '<action:[0-9a-zA-Z_\-]+>/<dirtyAlias:\w.+>' => 'default/<action>',
+               // '<action:[0-9a-zA-Z_\-]+>/<item:\d+>/<m:\w+>/<dirtyAlias:\w.+>' => 'default/<action>',
             ],
         ]);
         $app->getUrlManager()->addRules($groupUrlRule->rules, true);
@@ -56,14 +57,41 @@ class Module extends WebModule implements BootstrapInterface
             false
         );*/
     }
+    public function getImage($dirtyAlias)
+    {
+        //Get params
 
+
+        $params = $data = $this->parseImageAlias($dirtyAlias);
+
+        $alias = $params['alias'];
+        $size = $params['size'];
+
+
+        //Lets get image
+        if (empty($this->className)) {
+            $imageQuery = Image::find();
+        } else {
+            /* @var $class Image */
+            $class = $this->className;
+            $imageQuery = $class::find();
+        }
+        $image = $imageQuery
+            ->where(['urlAlias' => $alias])
+            ->one();
+        //if (!$image) {
+        //    return $this->getPlaceHolder();
+        //}
+
+        return $image;
+    }
     /**
      * @param $object_id
      * @param $model
      * @param $dirtyAlias
      * @return array|null|\yii\db\ActiveRecord
      */
-    public function getImage($object_id, $model, $dirtyAlias)
+    public function getImage___old($object_id, $model, $dirtyAlias)
     {
         //Get params
 
