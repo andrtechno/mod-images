@@ -48,11 +48,7 @@ class Image extends ActiveRecord
     {
         $urlSize = ($size) ? '_' . $size : '';
         $url = Url::toRoute([
-            // '/' . Yii::$app->getModule('images')->id . '/get-image',
             '/images/default/get-file',
-            'item' => $this->object_id,
-            'm' => $this->modelName,
-            //'item' => $this->modelName . $this->object_id,
             'dirtyAlias' => $this->urlAlias . $urlSize . '.' . $this->getExtension()
         ]);
 
