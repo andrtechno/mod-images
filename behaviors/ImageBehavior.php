@@ -48,13 +48,7 @@ class ImageBehavior extends Behavior {
      * @throws \Exception
      */
     public function attachImage($absolutePath, $is_main = false, $name = '') {
-        /*if (!preg_match('#http#', $absolutePath)) {
-            if (!file_exists($absolutePath)) {
-                throw new \Exception('File not exist! :' . $absolutePath);
-            }
-        } else {
-            //nothing
-        }*/
+
 
         if (!$this->owner->primaryKey) {
             throw new \Exception('Owner must have primaryKey when you attach image!');
@@ -80,6 +74,18 @@ class ImageBehavior extends Behavior {
             throw new \Exception('Cant copy file! ' . $absolutePath . ' to ' . $newAbsolutePath);
         }
 
+
+
+        /*if (!preg_match('#http#', $absolutePath)) {
+            if (!file_exists($absolutePath)) {
+                throw new \Exception('File not exist! :' . $absolutePath);
+            }
+        } else {
+
+        }*/
+
+
+
         if (Yii::$app->getModule('images')->className === null) {
             $image = new Image;
         } else {
@@ -90,7 +96,6 @@ class ImageBehavior extends Behavior {
         $image->filePath = $pictureSubDir . '/' . $pictureFileName;
         $image->modelName = Yii::$app->getModule('images')->getShortClass($this->owner);
         $image->alt_title = $name;
-
         $image->urlAlias = $this->getAlias($image);
 
         if (!$image->save()) {
