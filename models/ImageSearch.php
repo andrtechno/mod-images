@@ -38,10 +38,11 @@ class ImageSearch extends Image
      * Creates data provider instance with search query applied
      *
      * @param array $params
+     * @param array $configure
      *
      * @return ActiveDataProvider
      */
-    public function search($params, $configure = array())
+    public function search($params, $configure = [])
     {
         $query = Image::find();
         //$query->joinWith('translations');
@@ -61,12 +62,11 @@ class ImageSearch extends Image
         }
 
 
-        $query->andFilterWhere([
+        $query->where([
             'object_id' => $configure['model']->primaryKey,
-        ]);
-        $query->andFilterWhere([
             'modelName' => Yii::$app->getModule('images')->getShortClass($configure['model'])
         ]);
+
         //$query->andFilterWhere(['id' => $this->id]);
         // Id of product to exclude from search
         if ($this->exclude) {
@@ -77,7 +77,7 @@ class ImageSearch extends Image
 
         $query->andFilterWhere(['like', 'alt_title', $this->alt_title]);
 
-
+       // echo $query->createCommand()->rawSql;die;
         return $dataProvider;
     }
 
