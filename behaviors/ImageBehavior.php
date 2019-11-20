@@ -2,32 +2,49 @@
 
 namespace panix\mod\images\behaviors;
 
+
 use Yii;
 use yii\base\Behavior;
 use yii\db\ActiveRecord;
 use panix\mod\images\models;
 use panix\mod\images\models\Image;
 use yii\helpers\BaseFileHelper;
+use yii\web\ForbiddenHttpException;
 
-class ImageBehavior extends Behavior {
-
+class ImageBehavior extends Behavior
+{
+    public $attribute;
     public $createAliasMethod = false;
-
-    public function attach($owner) {
+    protected $_file;
+    public function attach($owner)
+    {
         parent::attach($owner);
     }
 
-    public function events() {
+    public function events()
+    {
         return [
             ActiveRecord::EVENT_AFTER_INSERT => 'afterSave',
             ActiveRecord::EVENT_AFTER_UPDATE => 'afterSave',
             //ActiveRecord::EVENT_AFTER_FIND=>'test'
+            ActiveRecord::EVENT_BEFORE_UPDATE => 'beforeSave',
 
         ];
     }
 
+    public function beforeSave()
+    {
+        /** @var ActiveRecord $owner */
+        $owner = $this->owner;
+        $owner->file = \yii\web\UploadedFile::getInstances($owner, 'file');
+        if(count($owner->file) >= 3){
+            throw new ForbiddenHttpException();
+        }
 
-    public function afterSave() {
+    }
+
+    public function afterSave()
+    {
         if (!Yii::$app instanceof \yii\console\Application) {
             $this->updateMainImage();
             $this->updateImageTitles();
@@ -47,7 +64,8 @@ class ImageBehavior extends Behavior {
      * @return bool|Image
      * @throws \Exception
      */
-    public function attachImage($absolutePath, $is_main = false, $name = '') {
+    public function attachImage($absolutePath, $is_main = false, $name = '')
+    {
 
 
         if (!$this->owner->primaryKey) {
@@ -55,25 +73,24 @@ class ImageBehavior extends Behavior {
         }
 
         $pictureFileName = substr(md5(microtime(true) . $absolutePath), 4, 6)
-                . '.' .
-                pathinfo($absolutePath, PATHINFO_EXTENSION);
+            . '.' .
+            pathinfo($absolutePath, PATHINFO_EXTENSION);
         $pictureSubDir = Yii::$app->getModule('images')->getModelSubDir($this->owner);
         $storePath = Yii::$app->getModule('images')->getStorePath($this->owner);
 
         $newAbsolutePath = $storePath .
-                DIRECTORY_SEPARATOR . $pictureSubDir .
-                DIRECTORY_SEPARATOR . $pictureFileName;
+            DIRECTORY_SEPARATOR . $pictureSubDir .
+            DIRECTORY_SEPARATOR . $pictureFileName;
 
         BaseFileHelper::createDirectory($storePath . DIRECTORY_SEPARATOR . $pictureSubDir, 0775, true);
 
         copy($absolutePath, $newAbsolutePath);
-        if(file_exists($absolutePath)){
+        if (file_exists($absolutePath)) {
             unlink($absolutePath);
         }
         if (!file_exists($newAbsolutePath)) {
             throw new \Exception('Cant copy file! ' . $absolutePath . ' to ' . $newAbsolutePath);
         }
-
 
 
         /*if (!preg_match('#http#', $absolutePath)) {
@@ -83,7 +100,6 @@ class ImageBehavior extends Behavior {
         } else {
 
         }*/
-
 
 
         if (Yii::$app->getModule('images')->className === null) {
@@ -113,9 +129,9 @@ class ImageBehavior extends Behavior {
 
         //If main image not exists
         if (
-                $img == null
-                or
-                $is_main
+            $img == null
+            or
+            $is_main
         ) {
             $this->setMainImage($image);
         }
@@ -129,7 +145,8 @@ class ImageBehavior extends Behavior {
      * @param $img
      * @throws \Exception
      */
-    public function setMainImage($img) {
+    public function setMainImage($img)
+    {
 
         if ($this->owner->primaryKey != $img->object_id) {
             throw new \Exception('Image must belong to this model');
@@ -162,7 +179,8 @@ class ImageBehavior extends Behavior {
      * Clear all images cache (and resized copies)
      * @return bool
      */
-    public function clearImagesCache() {
+    public function clearImagesCache()
+    {
         $cachePath = Yii::$app->getModule('images')->getCachePath();
         $subdir = Yii::$app->getModule('images')->getModelSubDir($this->owner);
 
@@ -182,7 +200,8 @@ class ImageBehavior extends Behavior {
      * First image alwats must be main image
      * @return array|yii\db\ActiveRecord[]
      */
-    public function getImages($additionWhere = false) {
+    public function getImages($additionWhere = false)
+    {
 
         $finder = $this->getImagesFinder($additionWhere);
 
@@ -207,7 +226,8 @@ class ImageBehavior extends Behavior {
      * returns main model image
      * @return array|null|ActiveRecord
      */
-    public function getImage() {
+    public function getImage()
+    {
         if (Yii::$app->getModule('images')->className === null) {
             $imageQuery = Image::find();
         } else {
@@ -219,7 +239,7 @@ class ImageBehavior extends Behavior {
         $imageQuery->where($finder);
         //$imageQuery->orderBy(['is_main' => SORT_DESC, 'id' => SORT_ASC]);
         //$imageQuery->orderBy(['ordern' => SORT_DESC]);
-       //echo $imageQuery->createCommand()->rawSql;
+        //echo $imageQuery->createCommand()->rawSql;
         //die;
         $img = $imageQuery->one();
 
@@ -234,7 +254,8 @@ class ImageBehavior extends Behavior {
      * returns model image by name
      * @return array|null|ActiveRecord
      */
-    public function getImageByName($name) {
+    public function getImageByName($name)
+    {
         if (Yii::$app->getModule('images')->className === null) {
             $imageQuery = Image::find();
         } else {
@@ -258,7 +279,8 @@ class ImageBehavior extends Behavior {
     /**
      * Remove all model images
      */
-    public function removeImages() {
+    public function removeImages()
+    {
         $images = $this->owner->getImages();
         if (count($images) < 1) {
             return true;
@@ -273,7 +295,6 @@ class ImageBehavior extends Behavior {
         }
     }
 
-    
 
     /**
      * removes concrete model's image
@@ -281,7 +302,8 @@ class ImageBehavior extends Behavior {
      * @throws \Exception
      * @return bool
      */
-    public function removeImage(Image $img) {
+    public function removeImage(Image $img)
+    {
         if ($img instanceof models\PlaceHolder) {
             return false;
         }
@@ -294,10 +316,11 @@ class ImageBehavior extends Behavior {
             unlink($fileToRemove);
         }
         //$img->delete();
-      //  return true;
+        //  return true;
     }
 
-    private function getImagesFinder($additionWhere = false) {
+    private function getImagesFinder($additionWhere = false)
+    {
         $base = [
             'object_id' => $this->owner->primaryKey,
             'modelName' => Yii::$app->getModule('images')->getShortClass($this->owner)
@@ -314,7 +337,8 @@ class ImageBehavior extends Behavior {
      * @return string
      * @throws \Exception
      */
-    private function getAliasString() {
+    private function getAliasString()
+    {
         if ($this->createAliasMethod) {
             $string = $this->owner->{$this->createAliasMethod}();
             if (!is_string($string)) {
@@ -332,14 +356,16 @@ class ImageBehavior extends Behavior {
      * Обновить алиасы для картинок
      * Зачистить кэш
      */
-    public function getAlias() {
+    public function getAlias()
+    {
         $aliasWords = $this->getAliasString();
         $imagesCount = count($this->owner->getImages());
 
         return $aliasWords . '-' . intval($imagesCount + 1);
     }
 
-    protected function updateMainImage() {
+    protected function updateMainImage()
+    {
         $post = Yii::$app->request->post('AttachmentsMainId');
         if ($post) {
             $modelName = Yii::$app->getModule('images')->getShortClass($this->owner);
@@ -347,20 +373,21 @@ class ImageBehavior extends Behavior {
             Image::updateAll(['is_main' => 0], 'object_id=:pid AND modelName=:model', ['model' => $modelName, 'pid' => $this->owner->primaryKey]);
 
             $customer = Image::findOne($post);
-         
+
             $customer->is_main = 1;
             $customer->update();
-           
+
         }
     }
 
-    protected function updateImageTitles() {
+    protected function updateImageTitles()
+    {
         if (sizeof(Yii::$app->request->post('attachment_image_titles', []))) {
             foreach (Yii::$app->request->post('attachment_image_titles', []) as $id => $title) {
-                if(!empty($title)){
-                $customer = Image::findOne($id);
-                $customer->alt_title = $title;
-                $customer->update();
+                if (!empty($title)) {
+                    $customer = Image::findOne($id);
+                    $customer->alt_title = $title;
+                    $customer->update();
                 }
             }
         }

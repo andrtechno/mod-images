@@ -15,6 +15,10 @@ class DefaultController extends WebController {
                 'modelClass' => Image::class,
                 'successMessage' => Yii::t('shop/admin', 'SORT_IMAGE_SUCCESS_MESSAGE')
             ],
+            'delete' => [
+                'class' => 'panix\engine\actions\DeleteAction',
+                'modelClass' => Image::class,
+            ],
         ];
     }
 
