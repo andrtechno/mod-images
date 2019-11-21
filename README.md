@@ -136,7 +136,7 @@ Installation
                 'graphicsLibrary' => 'GD', //but really its better to use 'Imagick' 
                 'placeHolderPath' => '@webroot/images/placeHolder.png', // if you want to get placeholder when image not exists, string will be processed by Yii::getAlias
                 'imageCompressionQuality' => 100, // Optional. Default value is 85.
-                'waterMark' => '@webroot/uploads/watermark.png'
+                'waterMark' => '@app/web/uploads/watermark.png'
             ],
         ],
     ```

@@ -160,7 +160,19 @@ class Image extends ActiveRecord
 
         /** @var $img \panix\engine\components\ImageHandler */
         $img = Yii::$app->img;
+
+
+
+
         $img->load($imagePath);
+        $configApp= Yii::$app->settings->get('app');
+       // if(YII_DEBUG){
+            $offsetX = isset($configApp->attachment_wm_offsetx) ? $configApp->attachment_wm_offsetx : 10;
+            $offsetY = isset($configApp->attachment_wm_offsety) ? $configApp->attachment_wm_offsety : 10;
+            $corner = isset($configApp->attachment_wm_corner) ? $configApp->attachment_wm_corner : 4;
+            $path = !empty($configApp->attachment_wm_path) ? $configApp->attachment_wm_path : Yii::getAlias('@uploads') . '/watermark.png';
+            $img->watermark($path, $offsetX, $offsetY, $corner, false);
+       // }
 
         if ($sizes) {
             $img->resize((!empty($sizes[0])) ? $sizes[0] : 0, (!empty($sizes[1])) ? $sizes[1] : 0);
