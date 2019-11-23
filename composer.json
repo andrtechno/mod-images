@@ -14,7 +14,7 @@
         "yiisoft/yii2-codeception": "*",
         "codeception/specify": "*",
         "codeception/verify": "*",
-        "mikey179/vfsStream": "1.6.8"
+        "mikey179/vfsstream": "1.6.8"
     },
     "suggest": {
         "ext-imagick": ""
