@@ -147,7 +147,7 @@ Installation
         {
             return [
                 'image' => [
-                    'class' => 'panix\mod\images\behaviors\ImageBehave',
+                    'class' => 'panix\mod\images\behaviors\ImageBehavior',
                 ]
             ];
         }

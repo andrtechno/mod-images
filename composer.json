@@ -3,7 +3,7 @@
     "description": "PIXELION CMS module images",
     "keywords": ["pixelion-cms"],
     "type": "yii2-extension",
-    "license": "BSD-3-Clause",
+    "license": "MIT",
     "minimum-stability": "dev",
     "require": {
         "yiisoft/yii2": "*",
