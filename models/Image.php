@@ -88,7 +88,12 @@ class Image extends ActiveRecord
 
     public function getContent($size = false)
     {
-        return file_get_contents($this->getPath($size));
+        //return file_get_contents($this->getPath($size));
+        //print_r($this->getPath($size));die;
+        // $origin = $this->getPathToOrigin();
+        //echo $origin;die;
+        //$this->createVersion($origin, $size);
+        return $this->getPath($size);
     }
 
     public function getPathToOrigin()
@@ -156,135 +161,38 @@ class Image extends ActiveRecord
     public function createVersion($imagePath, $sizeString = false)
     {
 
+
         $sizes = explode('x', $sizeString);
 
         /** @var $img \panix\engine\components\ImageHandler */
         $img = Yii::$app->img;
-
-
-
-
         $img->load($imagePath);
-        $configApp= Yii::$app->settings->get('app');
-       // if(YII_DEBUG){
-            $offsetX = isset($configApp->attachment_wm_offsetx) ? $configApp->attachment_wm_offsetx : 10;
-            $offsetY = isset($configApp->attachment_wm_offsety) ? $configApp->attachment_wm_offsety : 10;
-            $corner = isset($configApp->attachment_wm_corner) ? $configApp->attachment_wm_corner : 4;
-            $path = !empty($configApp->attachment_wm_path) ? $configApp->attachment_wm_path : Yii::getAlias('@uploads') . '/watermark.png';
-            $img->watermark($path, $offsetX, $offsetY, $corner, false);
-       // }
+
+
+        $configApp = Yii::$app->settings->get('app');
+
+        $offsetX = isset($configApp->attachment_wm_offsetx) ? $configApp->attachment_wm_offsetx : 10;
+        $offsetY = isset($configApp->attachment_wm_offsety) ? $configApp->attachment_wm_offsety : 10;
+        $corner = isset($configApp->attachment_wm_corner) ? $configApp->attachment_wm_corner : 4;
+        $path = !empty($configApp->attachment_wm_path) ? $configApp->attachment_wm_path : Yii::getAlias('@uploads') . '/watermark.png';
+        $wm_width = 0;
+        if ($imageInfo = @getimagesize($path)) {
+            $wm_width = (float)$imageInfo[0];
+            // $wm_height = (float)$imageInfo[1];
+        }
+
+        $toWidth = min($img->getWidth(), $wm_width);
+        $wm_zoom = round($toWidth / $wm_width / 2, 1);
+        $img->watermark($path, $offsetX, $offsetY, $corner, $wm_zoom);
 
         if ($sizes) {
             $img->resize((!empty($sizes[0])) ? $sizes[0] : 0, (!empty($sizes[1])) ? $sizes[1] : 0);
         }
 
+
         $img->show();
+        die;
 
-        Yii::$app->end();
-
-
-        if (strlen($this->urlAlias) < 1) {
-            throw new \Exception('Image without urlAlias!');
-        }
-
-        $cachePath = Yii::$app->getModule('images')->getCachePath();
-
-        $subDirPath = $this->getSubDur();
-        $fileExtension = pathinfo($this->filePath, PATHINFO_EXTENSION);
-
-        if ($sizeString) {
-            $sizePart = '_' . $sizeString;
-        } else {
-            $sizePart = '';
-        }
-
-        $pathToSave = $cachePath . '/' . $subDirPath . '/' . $this->urlAlias . $sizePart . '.' . $fileExtension;
-
-        BaseFileHelper::createDirectory(dirname($pathToSave), 0777, true);
-
-
-        if ($sizeString) {
-            $size = Yii::$app->getModule('images')->parseSize($sizeString);
-        } else {
-            $size = false;
-        }
-
-        if (Yii::$app->getModule('images')->graphicsLibrary == 'Imagick') {
-            $image = new \Imagick($imagePath);
-
-            $image->setImageCompressionQuality(Yii::$app->getModule('images')->imageCompressionQuality);
-
-            if ($size) {
-                if ($size['height'] && $size['width']) {
-                    $image->cropThumbnailImage($size['width'], $size['height']);
-                } elseif ($size['height']) {
-                    $image->thumbnailImage(0, $size['height']);
-                } elseif ($size['width']) {
-                    $image->thumbnailImage($size['width'], 0);
-                } else {
-                    throw new \Exception('Something wrong with this->module->parseSize($sizeString)');
-                }
-            }
-
-            $image->writeImage($pathToSave);
-        } else {
-
-            $image = new \claviska\SimpleImage($imagePath);
-
-            if ($size) {
-                if ($size['height'] && $size['width']) {
-
-                    $image->thumbnail($size['width'], $size['height']);
-                } elseif ($size['height']) {
-                    $image->fitToHeight($size['height']);
-                } elseif ($size['width']) {
-                    $image->fitToWidth($size['width']);
-                } else {
-                    throw new \Exception('Something wrong with this->module->parseSize($sizeString)');
-                }
-            }
-
-            //WaterMark
-            if (Yii::$app->getModule('images')->waterMark) {
-
-                if (!file_exists(Yii::getAlias(Yii::$app->getModule('images')->waterMark))) {
-                    throw new Exception('WaterMark not detected!');
-                }
-
-                $wmMaxWidth = intval($image->getWidth() * 0.4);
-                $wmMaxHeight = intval($image->getHeight() * 0.4);
-
-                $waterMarkPath = Yii::getAlias(Yii::$app->getModule('images')->waterMark);
-
-                $waterMark = new \claviska\SimpleImage($waterMarkPath);
-
-
-                if ($waterMark->getHeight() > $wmMaxHeight or $waterMark->getWidth() > $wmMaxWidth) {
-
-                    $waterMarkPath = Yii::$app->getModule('images')->getCachePath() . DIRECTORY_SEPARATOR .
-                        pathinfo(Yii::$app->getModule('images')->waterMark)['filename'] .
-                        $wmMaxWidth . 'x' . $wmMaxHeight . '.' .
-                        pathinfo(Yii::$app->getModule('images')->waterMark)['extension'];
-
-                    //throw new Exception($waterMarkPath);
-                    if (!file_exists($waterMarkPath)) {
-                        $waterMark->fitToWidth($wmMaxWidth);
-                        $waterMark->toFile($waterMarkPath, 'image/png', 100);
-                        if (!file_exists($waterMarkPath)) {
-                            throw new Exception('Cant save watermark to ' . $waterMarkPath . '!!!');
-                        }
-                    }
-                }
-
-                $image->overlay($waterMarkPath, 'bottom right', .5, -10, -10);
-            }
-
-            $image->toFile($pathToSave, $image->getMimeType(), Yii::$app->getModule('images')->imageCompressionQuality);
-            //$image->save($pathToSave, Yii::$app->getModule('images')->imageCompressionQuality);
-        }
-
-
-        return $image;
     }
 
     public function setMain($is_main = true)
