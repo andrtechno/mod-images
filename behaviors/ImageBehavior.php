@@ -123,12 +123,13 @@ class ImageBehavior extends Behavior
         /** @var ImageHandler $img */
         $file->saveAs($runtimePath);
         $img = Yii::$app->img->load($runtimePath);
-        $img->resize(1200, 1200);
+        if($img->getHeight() > 1200 || $img->getWidth() > 1200) {
+            $img->resize(1200, 1200);
 
-        if ($img->save($newAbsolutePath)) {
-            unlink($runtimePath);
+            if ($img->save($newAbsolutePath)) {
+                unlink($runtimePath);
+            }
         }
-
         return $image;
     }
 
