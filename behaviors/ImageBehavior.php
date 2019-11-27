@@ -3,6 +3,7 @@
 namespace panix\mod\images\behaviors;
 
 
+use panix\engine\components\ImageHandler;
 use Yii;
 use yii\base\Behavior;
 use yii\db\ActiveRecord;
@@ -10,12 +11,14 @@ use panix\mod\images\models;
 use panix\mod\images\models\Image;
 use yii\helpers\BaseFileHelper;
 use yii\web\ForbiddenHttpException;
+use yii\web\UploadedFile;
 
 class ImageBehavior extends Behavior
 {
     public $attribute;
     public $createAliasMethod = false;
     protected $_file;
+
     public function attach($owner)
     {
         parent::attach($owner);
@@ -37,7 +40,7 @@ class ImageBehavior extends Behavior
         /** @var ActiveRecord $owner */
         $owner = $this->owner;
         $owner->file = \yii\web\UploadedFile::getInstances($owner, 'file');
-        if(count($owner->file) >= 3){
+        if (count($owner->file) >= 3) {
             throw new ForbiddenHttpException();
         }
 
@@ -59,47 +62,32 @@ class ImageBehavior extends Behavior
      *
      * Method copies image file to module store and creates db record.
      *
-     * @param $absolutePath
+     * @param $file UploadedFile
      * @param bool $is_main
+     * @param string $name
      * @return bool|Image
      * @throws \Exception
      */
-    public function attachImage($absolutePath, $is_main = false, $name = '')
+    public function attachImage($file, $is_main = false, $name = '')
     {
 
+        $uniqueName = \panix\engine\CMS::gen(10);
+
+        $pictureFileName = $uniqueName . '.' . $file->extension;
 
         if (!$this->owner->primaryKey) {
             throw new \Exception('Owner must have primaryKey when you attach image!');
         }
 
-        $pictureFileName = substr(md5(microtime(true) . $absolutePath), 4, 6)
-            . '.' .
-            pathinfo($absolutePath, PATHINFO_EXTENSION);
         $pictureSubDir = Yii::$app->getModule('images')->getModelSubDir($this->owner);
         $storePath = Yii::$app->getModule('images')->getStorePath($this->owner);
 
-        $newAbsolutePath = $storePath .
-            DIRECTORY_SEPARATOR . $pictureSubDir .
-            DIRECTORY_SEPARATOR . $pictureFileName;
-
+        $newAbsolutePath = $storePath . DIRECTORY_SEPARATOR . $pictureSubDir . DIRECTORY_SEPARATOR . $pictureFileName;
+        $runtimePath = Yii::getAlias('@runtime') . DIRECTORY_SEPARATOR . $pictureFileName;
         BaseFileHelper::createDirectory($storePath . DIRECTORY_SEPARATOR . $pictureSubDir, 0775, true);
 
-        copy($absolutePath, $newAbsolutePath);
-        if (file_exists($absolutePath)) {
-            unlink($absolutePath);
-        }
-        if (!file_exists($newAbsolutePath)) {
-            throw new \Exception('Cant copy file! ' . $absolutePath . ' to ' . $newAbsolutePath);
-        }
 
 
-        /*if (!preg_match('#http#', $absolutePath)) {
-            if (!file_exists($absolutePath)) {
-                throw new \Exception('File not exist! :' . $absolutePath);
-            }
-        } else {
-
-        }*/
 
 
         if (Yii::$app->getModule('images')->className === null) {
@@ -128,14 +116,18 @@ class ImageBehavior extends Behavior
         $img = $this->owner->getImage();
 
         //If main image not exists
-        if (
-            $img == null
-            or
-            $is_main
-        ) {
+        if ($img == null || $is_main) {
             $this->setMainImage($image);
         }
 
+        /** @var ImageHandler $img */
+        $file->saveAs($runtimePath);
+        $img = Yii::$app->img->load($runtimePath);
+        $img->resize(1200, 1200);
+
+        if ($img->save($newAbsolutePath)) {
+            unlink($runtimePath);
+        }
 
         return $image;
     }
