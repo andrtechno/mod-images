@@ -78,14 +78,14 @@ class DefaultController extends Controller
 
             //  header('Cache-control: max-age='.(60*60*24*365));
             //  header('Expires: '.gmdate(DATE_RFC1123,time()+60*60*24*365));
-            $time = (60 * 60 * 24 * 365);
+           // $time = (60 * 60 * 24 * 365);
            // echo $image->getUrlToOrigin();
            // die;
 
             //@todo no work headers
-            Yii::$app->response->headers->set('Last-Modified', gmdate('D, d M Y H:i:s', filemtime($image->getUrlToOrigin())));
-            Yii::$app->response->headers->set('Cache-Control', 'public, max-age=' . $time);
-            Yii::$app->response->headers->set('Expires', gmdate('D, d M Y H:i:s',time()+$time).' GMT');
+           // Yii::$app->response->headers->set('Last-Modified', gmdate('D, d M Y H:i:s', filemtime($image->getUrlToOrigin())));
+           // Yii::$app->response->headers->set('Cache-Control', 'public, max-age=' . $time);
+           // Yii::$app->response->headers->set('Expires', gmdate('D, d M Y H:i:s',time()+$time).' GMT');
 
             //Yii::$app->response->headers->add('Last-Modified', gmdate('D, d M Y H:i:s', filemtime($image->getUrlToOrigin())));
             //Yii::$app->response->headers->add('Cache-Control', 'public, max-age=' . $time);
