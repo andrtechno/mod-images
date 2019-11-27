@@ -3,13 +3,16 @@
 namespace panix\mod\images\controllers;
 
 use Yii;
+use yii\base\Response;
 use yii\web\Controller;
 use yii\web\HttpException;
 use panix\mod\images\models\Image;
 
-class DefaultController extends Controller {
+class DefaultController extends Controller
+{
 
-    public function actions() {
+    public function actions()
+    {
         return [
             'sortable' => [
                 'class' => 'panix\engine\grid\sortable\Action',
@@ -18,7 +21,8 @@ class DefaultController extends Controller {
         ];
     }
 
-    public function actionLogo(){
+    public function actionLogo()
+    {
 
         Header('Content-type: text/xml');
         echo '<?xml version="1.0" encoding="utf-8"?>
@@ -42,7 +46,11 @@ class DefaultController extends Controller {
 </svg>';
         die;
     }
-    public function actionGetFile($dirtyAlias) {
+
+
+
+    public function actionGetFile($dirtyAlias)
+    {
 
         $dotParts = explode('.', $dirtyAlias);
         if (!isset($dotParts[1])) {
@@ -54,10 +62,8 @@ class DefaultController extends Controller {
         $alias = isset(explode('_', $dirtyAlias)[0]) ? explode('_', $dirtyAlias)[0] : false;
 
 
-
         /** @var $image Image */
         $image = \Yii::$app->getModule('images')->getImage($alias);
-
 
 
         if ($image && $image->getExtension() != $dotParts[1]) {
@@ -65,14 +71,35 @@ class DefaultController extends Controller {
         }
 
         if ($image) {
-            $image->getContent($size);
+
+            Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
+            // Yii::$app->response->headers->add('Content-type', 'image/jpeg');
+
+
+            //  header('Cache-control: max-age='.(60*60*24*365));
+            //  header('Expires: '.gmdate(DATE_RFC1123,time()+60*60*24*365));
+            $time = (60 * 60 * 24 * 365);
+           // echo $image->getUrlToOrigin();
+           // die;
+
+            //@todo no work headers
+            Yii::$app->response->headers->set('Last-Modified', gmdate('D, d M Y H:i:s', filemtime($image->getUrlToOrigin())));
+            Yii::$app->response->headers->set('Cache-Control', 'public, max-age=' . $time);
+            Yii::$app->response->headers->set('Expires', gmdate('D, d M Y H:i:s',time()+$time).' GMT');
+
+            //Yii::$app->response->headers->add('Last-Modified', gmdate('D, d M Y H:i:s', filemtime($image->getUrlToOrigin())));
+            //Yii::$app->response->headers->add('Cache-Control', 'public, max-age=' . $time);
+            //Yii::$app->response->headers->add('Expires', gmdate('D, d M Y H:i:s',time()+$time).' GMT');
+
+            return $image->getContent($size);
         } else {
             throw new HttpException(404, 'There is no images');
         }
     }
 
 
-    public function actionGetFile__OLD($item = '', $m = '', $dirtyAlias) {
+    public function actionGetFile__OLD($item = '', $m = '', $dirtyAlias)
+    {
 
 
         //if(file_exists(\Yii::$app->getModule('images')->imagesCachePath).DIRECTORY_SEPARATOR.$item.DIRECTORY_SEPARATOR.$m.DIRECTORY_SEPARATOR.$dirtyAlias)){
@@ -90,10 +117,8 @@ class DefaultController extends Controller {
         $alias = isset(explode('_', $dirtyAlias)[0]) ? explode('_', $dirtyAlias)[0] : false;
 
 
-
         /** @var $image Image */
         $image = \Yii::$app->getModule('images')->getImage($item, $m, $alias);
-
 
 
         if ($image && $image->getExtension() != $dotParts[1]) {
@@ -107,13 +132,14 @@ class DefaultController extends Controller {
         }
     }
 
-    public function actionDelete() {
+    public function actionDelete()
+    {
         $json = [];
 
         $modelName = (new \ReflectionClass(Yii::$app->request->post('model')))->getShortName();
         $entry = Image::find()
-                ->where(['id' => Yii::$app->request->post('id')])
-                ->all();
+            ->where(['id' => Yii::$app->request->post('id')])
+            ->all();
         if (!empty($entry)) {
             foreach ($entry as $page) {
                 /** @var $page Image */
@@ -125,8 +151,8 @@ class DefaultController extends Controller {
                     if ($page->is_main) {
                         // Get first image and set it as main
                         $model = Image::find()
-                                ->where(['object_id' => Yii::$app->request->post('object_id'), 'modelName' => $modelName])
-                                ->one();
+                            ->where(['object_id' => Yii::$app->request->post('object_id'), 'modelName' => $modelName])
+                            ->one();
 
                         if ($model) {
                             $model->is_main = 1;
@@ -146,10 +172,11 @@ class DefaultController extends Controller {
         Yii::$app->end();
     }
 
-    public function actionEditCrop($id) {
+    public function actionEditCrop($id)
+    {
         $entry = Image::find()
-                ->where(['id' => Yii::$app->request->get('id')])
-                ->one();
+            ->where(['id' => Yii::$app->request->get('id')])
+            ->one();
         if (Yii::$app->request->isAjax) {
             return $this->renderAjax('edit-crop', ['image' => $entry]);
         } else {
@@ -157,7 +184,8 @@ class DefaultController extends Controller {
         }
     }
 
-    public function actionCrop() {
+    public function actionCrop()
+    {
         $request = \Yii::$app->request;
         $post = $request->post();
         $form = $request->post('CropperForm');
@@ -192,7 +220,7 @@ class DefaultController extends Controller {
             //->flip('both') 
             //->flip('x')
             if ($request->method == 'ROTATE' && isset($post['CropperForm']['rotate'])) {
-                 $image->rotate($post['CropperForm']['rotate']);
+                $image->rotate($post['CropperForm']['rotate']);
             }
             // flip horizontally
             //->colorize('#3e8230')                      // tint dark blue
@@ -211,7 +239,7 @@ class DefaultController extends Controller {
             //$image->contrast(30);
             //$image->blur('gaussian',5); //very slow load
             //$image->darken(50);
-            $image->border('#ff0000',5);
+            $image->border('#ff0000', 5);
             $image->toFile('uploads/new-image1.jpg', 'image/png');      // convert to PNG and save a copy to new-image.png
             //$image->toString(); // output to the screen
             $image->toScreen();
