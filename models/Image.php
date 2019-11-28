@@ -4,7 +4,6 @@
 namespace panix\mod\images\models;
 
 use Yii;
-use yii\base\Exception;
 use yii\helpers\Url;
 use yii\helpers\BaseFileHelper;
 use panix\engine\db\ActiveRecord;
@@ -22,7 +21,7 @@ use panix\engine\db\ActiveRecord;
  */
 class Image extends ActiveRecord
 {
-
+    const MODULE_ID = 'images';
     private $helper = false;
 
     public function clearCache()
@@ -233,21 +232,6 @@ class Image extends ActiveRecord
             [['alt_title'], 'string', 'max' => 80],
             [['filePath', 'urlAlias'], 'string', 'max' => 400],
             [['modelName'], 'string', 'max' => 150]
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'filePath' => 'File Path',
-            'object_id' => 'Item ID',
-            'is_main' => 'Is Main',
-            'modelName' => 'Model Name',
-            'urlAlias' => 'Url Alias',
         ];
     }
 

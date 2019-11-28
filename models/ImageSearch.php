@@ -45,7 +45,6 @@ class ImageSearch extends Image
     public function search($params, $configure = [])
     {
         $query = Image::find();
-        //$query->joinWith('translations');
 
         $query->orderBy(['ordern' => SORT_DESC]);
         $dataProvider = new ActiveDataProvider([
