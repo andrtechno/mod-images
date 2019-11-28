@@ -87,9 +87,6 @@ class ImageBehavior extends Behavior
         BaseFileHelper::createDirectory($storePath . DIRECTORY_SEPARATOR . $pictureSubDir, 0775, true);
 
 
-
-
-
         if (Yii::$app->getModule('images')->className === null) {
             $image = new Image;
         } else {
@@ -123,13 +120,13 @@ class ImageBehavior extends Behavior
         /** @var ImageHandler $img */
         $file->saveAs($runtimePath);
         $img = Yii::$app->img->load($runtimePath);
-        if($img->getHeight() > 1200 || $img->getWidth() > 1200) {
-            $img->resize(1200, 1200);
-
-            if ($img->save($newAbsolutePath)) {
-                unlink($runtimePath);
-            }
+        if ($img->getHeight() > Yii::$app->params['maxUploadImageSize']['height'] || $img->getWidth() > Yii::$app->params['maxUploadImageSize']['width']) {
+            $img->resize(Yii::$app->params['maxUploadImageSize']['width'], Yii::$app->params['maxUploadImageSize']['height']);
         }
+        if ($img->save($newAbsolutePath)) {
+            unlink($runtimePath);
+        }
+
         return $image;
     }
 
