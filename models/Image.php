@@ -173,17 +173,18 @@ class Image extends ActiveRecord
         $offsetX = isset($configApp->attachment_wm_offsetx) ? $configApp->attachment_wm_offsetx : 10;
         $offsetY = isset($configApp->attachment_wm_offsety) ? $configApp->attachment_wm_offsety : 10;
         $corner = isset($configApp->attachment_wm_corner) ? $configApp->attachment_wm_corner : 4;
-        $path = !empty($configApp->attachment_wm_path) ? $configApp->attachment_wm_path : Yii::getAlias('@uploads') . '/watermark.png';
+        $path = Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . $configApp->attachment_wm_path;
         $wm_width = 0;
-        if ($imageInfo = @getimagesize($path)) {
-            $wm_width = (float)$imageInfo[0];
-            // $wm_height = (float)$imageInfo[1];
+        if (file_exists($path)) {
+            if ($imageInfo = @getimagesize($path)) {
+                $wm_width = (float)$imageInfo[0];
+                $wm_height = (float)$imageInfo[1];
+            }
+
+            $toWidth = min($img->getWidth(), $wm_width);
+            $wm_zoom = round($toWidth / $wm_width / 2, 1);
+            $img->watermark($path, $offsetX, $offsetY, $corner, $wm_zoom);
         }
-
-        $toWidth = min($img->getWidth(), $wm_width);
-        $wm_zoom = round($toWidth / $wm_width / 2, 1);
-        $img->watermark($path, $offsetX, $offsetY, $corner, $wm_zoom);
-
         if ($sizes) {
             $img->resize((!empty($sizes[0])) ? $sizes[0] : 0, (!empty($sizes[1])) ? $sizes[1] : 0);
         }
