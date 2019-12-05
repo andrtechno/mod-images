@@ -6,6 +6,7 @@ namespace panix\mod\images\behaviors;
 use panix\engine\components\ImageHandler;
 use Yii;
 use yii\base\Behavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use panix\mod\images\models;
 use panix\mod\images\models\Image;
@@ -13,15 +14,25 @@ use yii\helpers\BaseFileHelper;
 use yii\web\ForbiddenHttpException;
 use yii\web\UploadedFile;
 
+/**
+ * Class ImageBehavior
+ *
+ * @property ActiveQuery $imageQuery
+ * @package panix\mod\images\behaviors
+ */
 class ImageBehavior extends Behavior
 {
     public $attribute;
     public $createAliasMethod = false;
     protected $_file;
+    private $imageQuery;
 
     public function attach($owner)
     {
+
         parent::attach($owner);
+
+
     }
 
     public function events()
@@ -85,14 +96,15 @@ class ImageBehavior extends Behavior
         $newAbsolutePath = $storePath . DIRECTORY_SEPARATOR . $pictureSubDir . DIRECTORY_SEPARATOR . $pictureFileName;
         $runtimePath = Yii::getAlias('@runtime') . DIRECTORY_SEPARATOR . $pictureFileName;
         BaseFileHelper::createDirectory($storePath . DIRECTORY_SEPARATOR . $pictureSubDir, 0775, true);
+        //if (!file_exists($runtimePath)) {
+        //     die("error runtime file \"{$runtimePath}\"");
+        // }
+        // $file->saveAs($newAbsolutePath);
 
 
-        if (Yii::$app->getModule('images')->className === null) {
-            $image = new Image;
-        } else {
-            $class = Yii::$app->getModule('images')->className;
-            $image = new $class();
-        }
+
+
+        $image = new Image;
         $image->object_id = $this->owner->primaryKey;
         $image->filePath = $pictureSubDir . '/' . $pictureFileName;
         $image->modelName = Yii::$app->getModule('images')->getShortClass($this->owner);
@@ -100,6 +112,7 @@ class ImageBehavior extends Behavior
         $image->urlAlias = $this->getAlias($image);
 
         if (!$image->save()) {
+
             return false;
         }
 
@@ -118,13 +131,14 @@ class ImageBehavior extends Behavior
         }
 
         /** @var ImageHandler $img */
-        $file->saveAs($runtimePath);
-        $img = Yii::$app->img->load($runtimePath);
+        $file->saveAs($newAbsolutePath);
+
+        $img = Yii::$app->img->load($newAbsolutePath);
         if ($img->getHeight() > Yii::$app->params['maxUploadImageSize']['height'] || $img->getWidth() > Yii::$app->params['maxUploadImageSize']['width']) {
             $img->resize(Yii::$app->params['maxUploadImageSize']['width'], Yii::$app->params['maxUploadImageSize']['height']);
         }
         if ($img->save($newAbsolutePath)) {
-            unlink($runtimePath);
+            //   unlink($runtimePath);
         }
 
         return $image;
@@ -214,31 +228,30 @@ class ImageBehavior extends Behavior
 
     /**
      * returns main model image
+     * @param $main
      * @return array|null|ActiveRecord
      */
-    public function getImage()
+    public function getImage($main = 1)
     {
-        if (Yii::$app->getModule('images')->className === null) {
-            $imageQuery = Image::find();
-        } else {
-            $class = Yii::$app->getModule('images')->className;
-            $imageQuery = $class::find();
-        }
 
-        $finder = $this->getImagesFinder(['is_main' => 1]);
-        $imageQuery->where($finder);
-        //$imageQuery->orderBy(['is_main' => SORT_DESC, 'id' => SORT_ASC]);
-        //$imageQuery->orderBy(['ordern' => SORT_DESC]);
-        //echo $imageQuery->createCommand()->rawSql;
-        //die;
-        $img = $imageQuery->one();
+        $query = Image::find()->where([
+            'object_id' => $this->owner->primaryKey,
+            'modelName' => Yii::$app->getModule('images')->getShortClass($this->owner)
+        ]);
+
+        if ($main) {
+            $query->andWhere(['is_main' => 1]);
+        }
+        //echo $query->createCommand()->rawSql;die;
+        $img = $query->one();
 
         if (!$img) {
-            return NULL; //Yii::$app->getModule('images')->getPlaceHolder();
+            return NULL;
         }
 
         return $img;
     }
+
 
     /**
      * returns model image by name
@@ -246,18 +259,19 @@ class ImageBehavior extends Behavior
      */
     public function getImageByName($name)
     {
-        if (Yii::$app->getModule('images')->className === null) {
-            $imageQuery = Image::find();
-        } else {
-            $class = Yii::$app->getModule('images')->className;
-            $imageQuery = $class::find();
-        }
-        $finder = $this->getImagesFinder(['name' => $name]);
-        $imageQuery->where($finder);
+        $query = Image::find()->where([
+            'object_id' => $this->owner->primaryKey,
+            'modelName' => Yii::$app->getModule('images')->getShortClass($this->owner)
+        ]);
+        $query->andWhere(['name' => $name]);
+        //    $imageQuery = Image::find();
+
+        //$finder = $this->getImagesFinder(['name' => $name]);
+        //$imageQuery->where($finder);
         //$imageQuery->orderBy(['is_main' => SORT_DESC, 'id' => SORT_ASC]);
         //$imageQuery->orderBy(['ordern' => SORT_DESC]);
 
-        $img = $imageQuery->one();
+        $img = $query->one();
         if (!$img) {
             // return Yii::$app->getModule('images')->getPlaceHolder();
             return NULL;
@@ -363,10 +377,10 @@ class ImageBehavior extends Behavior
             Image::updateAll(['is_main' => 0], 'object_id=:pid AND modelName=:model', ['model' => $modelName, 'pid' => $this->owner->primaryKey]);
 
             $customer = Image::findOne($post);
-
-            $customer->is_main = 1;
-            $customer->update();
-
+            if ($customer) {
+                $customer->is_main = 1;
+                $customer->update();
+            }
         }
     }
 
@@ -376,8 +390,10 @@ class ImageBehavior extends Behavior
             foreach (Yii::$app->request->post('attachment_image_titles', []) as $id => $title) {
                 if (!empty($title)) {
                     $customer = Image::findOne($id);
-                    $customer->alt_title = $title;
-                    $customer->update();
+                    if ($customer) {
+                        $customer->alt_title = $title;
+                        $customer->update();
+                    }
                 }
             }
         }

@@ -174,7 +174,12 @@ class Image extends ActiveRecord
         $offsetY = isset($configApp->attachment_wm_offsety) ? $configApp->attachment_wm_offsety : 10;
         $corner = isset($configApp->attachment_wm_corner) ? $configApp->attachment_wm_corner : 4;
         $path = Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . $configApp->attachment_wm_path;
+
+        if ($sizes) {
+            $img->resize((!empty($sizes[0])) ? $sizes[0] : 0, (!empty($sizes[1])) ? $sizes[1] : 0);
+        }
         $wm_width = 0;
+        $wm_height=0;
         if (file_exists($path)) {
             if ($imageInfo = @getimagesize($path)) {
                 $wm_width = (float)$imageInfo[0];
@@ -182,13 +187,19 @@ class Image extends ActiveRecord
             }
 
             $toWidth = min($img->getWidth(), $wm_width);
-            $wm_zoom = round($toWidth / $wm_width / 2, 1);
-            $img->watermark($path, $offsetX, $offsetY, $corner, $wm_zoom);
-        }
-        if ($sizes) {
-            $img->resize((!empty($sizes[0])) ? $sizes[0] : 0, (!empty($sizes[1])) ? $sizes[1] : 0);
-        }
 
+            if($wm_width > $img->getWidth() || $wm_height > $img->getHeight()){
+                $wm_zoom = round($toWidth / $wm_width / 3, 1);
+            }else{
+                $wm_zoom=false;
+            }
+
+            if(!($img->getWidth() <= $wm_width) || !($img->getHeight() <= $wm_height)){
+                $img->watermark($path, $offsetX, $offsetY, $corner, $wm_zoom);
+            }
+
+
+        }
 
         $img->show();
         die;
