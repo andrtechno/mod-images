@@ -6,9 +6,8 @@
     "license": "MIT",
     "minimum-stability": "dev",
     "require": {
-        "yiisoft/yii2": "*",
         "abeautifulsite/simpleimage": "3.3.*",
-        "panix/wgt-cropper": "*"
+        "panix/wgt-cropper": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",
