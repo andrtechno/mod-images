@@ -73,7 +73,7 @@ class ImageBehavior extends Behavior
      *
      * Method copies image file to module store and creates db record.
      *
-     * @param $file UploadedFile
+     * @param $file|string UploadedFile Or absolute url
      * @param bool $is_main
      * @param string $name
      * @return bool|Image
@@ -81,10 +81,11 @@ class ImageBehavior extends Behavior
      */
     public function attachImage($file, $is_main = false, $name = '')
     {
-
         $uniqueName = \panix\engine\CMS::gen(10);
 
-        $pictureFileName = $uniqueName . '.' . $file->extension;
+
+
+
 
         if (!$this->owner->primaryKey) {
             throw new \Exception('Owner must have primaryKey when you attach image!');
@@ -93,8 +94,23 @@ class ImageBehavior extends Behavior
         $pictureSubDir = Yii::$app->getModule('images')->getModelSubDir($this->owner);
         $storePath = Yii::$app->getModule('images')->getStorePath($this->owner);
 
-        $newAbsolutePath = $storePath . DIRECTORY_SEPARATOR . $pictureSubDir . DIRECTORY_SEPARATOR . $pictureFileName;
-        $runtimePath = Yii::getAlias('@runtime') . DIRECTORY_SEPARATOR . $pictureFileName;
+
+        if(!is_object($file)){
+            $pictureFileName = $uniqueName . '.' . pathinfo($file, PATHINFO_EXTENSION);
+            $runtimePath = Yii::getAlias('@runtime') . DIRECTORY_SEPARATOR . $pictureFileName;
+            $newAbsolutePath = $storePath . DIRECTORY_SEPARATOR . $pictureSubDir . DIRECTORY_SEPARATOR . $pictureFileName;
+            copy($file, $newAbsolutePath);
+           // die($runtimePath);
+        }else{
+            $pictureFileName = $uniqueName . '.' . $file->extension;
+            $newAbsolutePath = $storePath . DIRECTORY_SEPARATOR . $pictureSubDir . DIRECTORY_SEPARATOR . $pictureFileName;
+        }
+
+
+
+
+
+        //$runtimePath = Yii::getAlias('@runtime') . DIRECTORY_SEPARATOR . $pictureFileName;
         BaseFileHelper::createDirectory($storePath . DIRECTORY_SEPARATOR . $pictureSubDir, 0775, true);
         //if (!file_exists($runtimePath)) {
         //     die("error runtime file \"{$runtimePath}\"");
@@ -131,8 +147,9 @@ class ImageBehavior extends Behavior
         }
 
         /** @var ImageHandler $img */
-        $file->saveAs($newAbsolutePath);
-
+        if(is_object($file)) {
+            $file->saveAs($newAbsolutePath);
+        }
         $img = Yii::$app->img->load($newAbsolutePath);
         if ($img->getHeight() > Yii::$app->params['maxUploadImageSize']['height'] || $img->getWidth() > Yii::$app->params['maxUploadImageSize']['width']) {
             $img->resize(Yii::$app->params['maxUploadImageSize']['width'], Yii::$app->params['maxUploadImageSize']['height']);
