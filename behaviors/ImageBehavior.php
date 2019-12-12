@@ -97,15 +97,11 @@ class ImageBehavior extends Behavior
 
         if(!is_object($file)){
             $pictureFileName = $uniqueName . '.' . pathinfo($file, PATHINFO_EXTENSION);
-            $runtimePath = Yii::getAlias('@runtime') . DIRECTORY_SEPARATOR . $pictureFileName;
-            $newAbsolutePath = $storePath . DIRECTORY_SEPARATOR . $pictureSubDir . DIRECTORY_SEPARATOR . $pictureFileName;
-            copy($file, $newAbsolutePath);
-           // die($runtimePath);
         }else{
             $pictureFileName = $uniqueName . '.' . $file->extension;
-            $newAbsolutePath = $storePath . DIRECTORY_SEPARATOR . $pictureSubDir . DIRECTORY_SEPARATOR . $pictureFileName;
-        }
 
+        }
+        $newAbsolutePath = $storePath . DIRECTORY_SEPARATOR . $pictureSubDir . DIRECTORY_SEPARATOR . $pictureFileName;
 
 
 
@@ -116,8 +112,6 @@ class ImageBehavior extends Behavior
         //     die("error runtime file \"{$runtimePath}\"");
         // }
         // $file->saveAs($newAbsolutePath);
-
-
 
 
         $image = new Image;
@@ -149,6 +143,8 @@ class ImageBehavior extends Behavior
         /** @var ImageHandler $img */
         if(is_object($file)) {
             $file->saveAs($newAbsolutePath);
+        }else{
+            copy($file, $newAbsolutePath);
         }
         $img = Yii::$app->img->load($newAbsolutePath);
         if ($img->getHeight() > Yii::$app->params['maxUploadImageSize']['height'] || $img->getWidth() > Yii::$app->params['maxUploadImageSize']['width']) {
