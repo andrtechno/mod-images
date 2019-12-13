@@ -2,6 +2,7 @@
 
 namespace panix\mod\images\controllers;
 
+use panix\engine\CMS;
 use Yii;
 use yii\base\Response;
 use yii\web\Controller;
@@ -64,6 +65,7 @@ class DefaultController extends Controller
 
         /** @var $image Image */
         $image = \Yii::$app->getModule('images')->getImage($alias);
+
 
 
         if ($image && $image->getExtension() != $dotParts[1]) {

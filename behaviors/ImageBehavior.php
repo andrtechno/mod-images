@@ -3,6 +3,7 @@
 namespace panix\mod\images\behaviors;
 
 
+use panix\engine\CMS;
 use panix\engine\components\ImageHandler;
 use Yii;
 use yii\base\Behavior;
@@ -24,6 +25,7 @@ class ImageBehavior extends Behavior
 {
     public $attribute;
     public $createAliasMethod = false;
+    public $path = '@uploads';
     protected $_file;
     private $imageQuery;
 
@@ -73,7 +75,7 @@ class ImageBehavior extends Behavior
      *
      * Method copies image file to module store and creates db record.
      *
-     * @param $file|string UploadedFile Or absolute url
+     * @param $file |string UploadedFile Or absolute url
      * @param bool $is_main
      * @param string $name
      * @return bool|Image
@@ -84,40 +86,32 @@ class ImageBehavior extends Behavior
         $uniqueName = \panix\engine\CMS::gen(10);
 
 
-
-
-
         if (!$this->owner->primaryKey) {
             throw new \Exception('Owner must have primaryKey when you attach image!');
         }
 
-        $pictureSubDir = Yii::$app->getModule('images')->getModelSubDir($this->owner);
-        $storePath = Yii::$app->getModule('images')->getStorePath($this->owner);
 
-
-        if(!is_object($file)){
+        if (!is_object($file)) {
             $pictureFileName = $uniqueName . '.' . pathinfo($file, PATHINFO_EXTENSION);
-        }else{
+        } else {
             $pictureFileName = $uniqueName . '.' . $file->extension;
 
         }
-        $newAbsolutePath = $storePath . DIRECTORY_SEPARATOR . $pictureSubDir . DIRECTORY_SEPARATOR . $pictureFileName;
+        $path = Yii::getAlias($this->path) . DIRECTORY_SEPARATOR . $this->owner->primaryKey;
+        $newAbsolutePath = $path . DIRECTORY_SEPARATOR . $pictureFileName;
+
+        BaseFileHelper::createDirectory($path, 0775, true);
 
 
 
-
-        //$runtimePath = Yii::getAlias('@runtime') . DIRECTORY_SEPARATOR . $pictureFileName;
-        BaseFileHelper::createDirectory($storePath . DIRECTORY_SEPARATOR . $pictureSubDir, 0775, true);
-        //if (!file_exists($runtimePath)) {
-        //     die("error runtime file \"{$runtimePath}\"");
-        // }
-        // $file->saveAs($newAbsolutePath);
 
 
         $image = new Image;
         $image->object_id = $this->owner->primaryKey;
-        $image->filePath = $pictureSubDir . '/' . $pictureFileName;
-        $image->modelName = Yii::$app->getModule('images')->getShortClass($this->owner);
+        $image->filePath = $pictureFileName;
+        $image->handler_class = '\\'.get_class($this->owner);
+        $image->handler_hash = $this->owner->getHash();
+        $image->path = $this->path;
         $image->alt_title = $name;
         $image->urlAlias = $this->getAlias($image);
 
@@ -141,9 +135,9 @@ class ImageBehavior extends Behavior
         }
 
         /** @var ImageHandler $img */
-        if(is_object($file)) {
+        if (is_object($file)) {
             $file->saveAs($newAbsolutePath);
-        }else{
+        } else {
             copy($file, $newAbsolutePath);
         }
         $img = Yii::$app->img->load($newAbsolutePath);
@@ -249,9 +243,8 @@ class ImageBehavior extends Behavior
 
         $query = Image::find()->where([
             'object_id' => $this->owner->primaryKey,
-            'modelName' => Yii::$app->getModule('images')->getShortClass($this->owner)
+            'handler_hash' => $this->owner->getHash()
         ]);
-
         if ($main) {
             $query->andWhere(['is_main' => 1]);
         }
@@ -274,7 +267,7 @@ class ImageBehavior extends Behavior
     {
         $query = Image::find()->where([
             'object_id' => $this->owner->primaryKey,
-            'modelName' => Yii::$app->getModule('images')->getShortClass($this->owner)
+            'handler_hash' => $this->owner->getHash()
         ]);
         $query->andWhere(['name' => $name]);
         //    $imageQuery = Image::find();
@@ -340,7 +333,7 @@ class ImageBehavior extends Behavior
     {
         $base = [
             'object_id' => $this->owner->primaryKey,
-            'modelName' => Yii::$app->getModule('images')->getShortClass($this->owner)
+            'handler_hash' => $this->owner->getHash()
         ];
 
         if ($additionWhere) {
@@ -385,9 +378,8 @@ class ImageBehavior extends Behavior
     {
         $post = Yii::$app->request->post('AttachmentsMainId');
         if ($post) {
-            $modelName = Yii::$app->getModule('images')->getShortClass($this->owner);
 
-            Image::updateAll(['is_main' => 0], 'object_id=:pid AND modelName=:model', ['model' => $modelName, 'pid' => $this->owner->primaryKey]);
+            Image::updateAll(['is_main' => 0], 'object_id=:pid AND handler_hash=:hash', ['hash' => $this->owner->getHash(), 'pid' => $this->owner->primaryKey]);
 
             $customer = Image::findOne($post);
             if ($customer) {

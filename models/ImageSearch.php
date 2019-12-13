@@ -63,7 +63,7 @@ class ImageSearch extends Image
 
         $query->where([
             'object_id' => $configure['model']->primaryKey,
-            'modelName' => Yii::$app->getModule('images')->getShortClass($configure['model'])
+            'handler_hash' => $configure['model']->getHash()
         ]);
 
         //$query->andFilterWhere(['id' => $this->id]);

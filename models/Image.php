@@ -4,6 +4,7 @@
 namespace panix\mod\images\models;
 
 use Yii;
+use yii\base\Exception;
 use yii\helpers\Url;
 use yii\helpers\BaseFileHelper;
 use panix\engine\db\ActiveRecord;
@@ -15,27 +16,16 @@ use panix\engine\db\ActiveRecord;
  * @property string $filePath
  * @property integer $object_id
  * @property integer $is_main
- * @property string $modelName
  * @property string $urlAlias
  * @property string $alt_title
+ * @property string $handler_class
+ * @property string $handler_hash
  */
 class Image extends ActiveRecord
 {
     const MODULE_ID = 'images';
     private $helper = false;
 
-    public function clearCache()
-    {
-        $subDir = $this->getSubDur();
-
-        $dirToRemove = Yii::$app->getModule('images')->getCachePath() . DIRECTORY_SEPARATOR . $subDir;
-
-        if (preg_match('/' . preg_quote($this->modelName, '/') . '/', $dirToRemove)) {
-            BaseFileHelper::removeDirectory($dirToRemove);
-        }
-
-        return true;
-    }
 
     public function getExtension()
     {
@@ -66,19 +56,27 @@ class Image extends ActiveRecord
     public function getPath($size = false)
     {
         $urlSize = ($size) ? '_' . $size : '';
-        $base = Yii::$app->getModule('images')->getCachePath();
-        $sub = $this->getSubDur();
+        //$base = Yii::$app->getModule('images')->getCachePath();
+        //$sub = $this->getSubDur();
 
         $origin = $this->getPathToOrigin();
 
-        $filePath = $base . DIRECTORY_SEPARATOR .
-            $sub . DIRECTORY_SEPARATOR . $this->urlAlias . $urlSize . '.' . pathinfo($origin, PATHINFO_EXTENSION);
+        //$filePath = $base . DIRECTORY_SEPARATOR .
+        //    $sub . DIRECTORY_SEPARATOR . $this->urlAlias . $urlSize . '.' . pathinfo($origin, PATHINFO_EXTENSION);
 
+        //echo Yii::getAlias($this->path).DIRECTORY_SEPARATOR.$this->object_id.DIRECTORY_SEPARATOR.$this->filePath;
+        //echo '<br>';
+        //echo $filePath;
+
+        $filePath = Yii::getAlias($this->path) . DIRECTORY_SEPARATOR . $this->object_id . DIRECTORY_SEPARATOR . $this->filePath;
+        //die;
 
         // if (!file_exists($filePath)) {
-        $this->createVersion($origin, $size);
+
         if (!file_exists($filePath)) {
-            throw new \Exception('Problem with image creating.');
+            throw new Exception('Problem with image creating.');
+        } else {
+            $this->createVersion($origin, $size);
         }
         // }
 
@@ -97,8 +95,9 @@ class Image extends ActiveRecord
 
     public function getPathToOrigin()
     {
-        $base = Yii::$app->getModule('images')->getStorePath();
-        $filePath = $base . DIRECTORY_SEPARATOR . $this->filePath;
+        //$base = Yii::$app->getModule('images')->getStorePath();
+        $filePath = Yii::getAlias($this->path) . DIRECTORY_SEPARATOR . $this->object_id . DIRECTORY_SEPARATOR . $this->filePath;
+
         return $filePath;
     }
 
@@ -179,7 +178,7 @@ class Image extends ActiveRecord
             $img->resize((!empty($sizes[0])) ? $sizes[0] : 0, (!empty($sizes[1])) ? $sizes[1] : 0);
         }
         $wm_width = 0;
-        $wm_height=0;
+        $wm_height = 0;
         if (file_exists($path)) {
             if ($imageInfo = @getimagesize($path)) {
                 $wm_width = (float)$imageInfo[0];
@@ -188,13 +187,13 @@ class Image extends ActiveRecord
 
             $toWidth = min($img->getWidth(), $wm_width);
 
-            if($wm_width > $img->getWidth() || $wm_height > $img->getHeight()){
+            if ($wm_width > $img->getWidth() || $wm_height > $img->getHeight()) {
                 $wm_zoom = round($toWidth / $wm_width / 3, 1);
-            }else{
-                $wm_zoom=false;
+            } else {
+                $wm_zoom = false;
             }
 
-            if(!($img->getWidth() <= $wm_width) || !($img->getHeight() <= $wm_height)){
+            if (!($img->getWidth() <= $wm_width) || !($img->getHeight() <= $wm_height)) {
                 $img->watermark($path, $offsetX, $offsetY, $corner, $wm_zoom);
             }
 
@@ -220,11 +219,6 @@ class Image extends ActiveRecord
         return image_type_to_mime_type(exif_imagetype($this->getPath($size)));
     }
 
-    protected function getSubDur()
-    {
-        return \yii\helpers\Inflector::pluralize($this->modelName) . '/' . $this->object_id;
-    }
-
     /**
      * @inheritdoc
      */
@@ -239,20 +233,19 @@ class Image extends ActiveRecord
     public function rules()
     {
         return [
-            [['filePath', 'object_id', 'modelName', 'urlAlias'], 'required'],
+            [['filePath', 'object_id', 'urlAlias', 'handler_hash', 'handler_class'], 'required'],
             [['object_id', 'is_main'], 'integer'],
             [['alt_title'], 'string', 'max' => 80],
             [['filePath', 'urlAlias'], 'string', 'max' => 400],
-            [['modelName'], 'string', 'max' => 150]
+            [['handler_class', 'handler_hash'], 'string', 'max' => 150]
         ];
     }
 
     public function afterDelete()
     {
-        $this->clearCache();
-        $storePath = Yii::$app->getModule('images')->getStorePath();
 
-        $fileToRemove = $storePath . DIRECTORY_SEPARATOR . $this->filePath;
+        $fileToRemove = $this->getPathToOrigin();
+
         if (preg_match('@\.@', $fileToRemove) and is_file($fileToRemove)) {
             unlink($fileToRemove);
         }
