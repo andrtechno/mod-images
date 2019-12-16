@@ -316,7 +316,6 @@ class ImageBehavior extends Behavior
         if ($img instanceof models\PlaceHolder) {
             return false;
         }
-        $img->clearCache();
 
         $storePath = Yii::$app->getModule('images')->getStorePath();
 
