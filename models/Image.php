@@ -181,8 +181,8 @@ class Image extends ActiveRecord
         $wm_height = 0;
         if (file_exists($path)) {
             if ($imageInfo = @getimagesize($path)) {
-                $wm_width = (float)$imageInfo[0];
-                $wm_height = (float)$imageInfo[1];
+                $wm_width = (float)$imageInfo[0] + $offsetX;
+                $wm_height = (float)$imageInfo[1] + $offsetY;
             }
 
             $toWidth = min($img->getWidth(), $wm_width);
