@@ -177,29 +177,30 @@ class Image extends ActiveRecord
         if ($sizes) {
             $img->resize((!empty($sizes[0])) ? $sizes[0] : 0, (!empty($sizes[1])) ? $sizes[1] : 0);
         }
-        $wm_width = 0;
-        $wm_height = 0;
-        if (file_exists($path)) {
-            if ($imageInfo = @getimagesize($path)) {
-                $wm_width = (float)$imageInfo[0] + $offsetX;
-                $wm_height = (float)$imageInfo[1] + $offsetY;
+        if ($configApp->watermark_enable) {
+            $wm_width = 0;
+            $wm_height = 0;
+            if (file_exists($path)) {
+                if ($imageInfo = @getimagesize($path)) {
+                    $wm_width = (float)$imageInfo[0] + $offsetX;
+                    $wm_height = (float)$imageInfo[1] + $offsetY;
+                }
+
+                $toWidth = min($img->getWidth(), $wm_width);
+
+                if ($wm_width > $img->getWidth() || $wm_height > $img->getHeight()) {
+                    $wm_zoom = round($toWidth / $wm_width / 3, 1);
+                } else {
+                    $wm_zoom = false;
+                }
+
+                if (!($img->getWidth() <= $wm_width) || !($img->getHeight() <= $wm_height)) {
+                    $img->watermark($path, $offsetX, $offsetY, $corner, $wm_zoom);
+                }
+
+
             }
-
-            $toWidth = min($img->getWidth(), $wm_width);
-
-            if ($wm_width > $img->getWidth() || $wm_height > $img->getHeight()) {
-                $wm_zoom = round($toWidth / $wm_width / 3, 1);
-            } else {
-                $wm_zoom = false;
-            }
-
-            if (!($img->getWidth() <= $wm_width) || !($img->getHeight() <= $wm_height)) {
-                $img->watermark($path, $offsetX, $offsetY, $corner, $wm_zoom);
-            }
-
-
         }
-
         $img->show();
         die;
 
