@@ -169,15 +169,16 @@ class Image extends ActiveRecord
 
         $configApp = Yii::$app->settings->get('app');
 
-        $offsetX = isset($configApp->attachment_wm_offsetx) ? $configApp->attachment_wm_offsetx : 10;
-        $offsetY = isset($configApp->attachment_wm_offsety) ? $configApp->attachment_wm_offsety : 10;
-        $corner = isset($configApp->attachment_wm_corner) ? $configApp->attachment_wm_corner : 4;
-        $path = Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . $configApp->attachment_wm_path;
 
         if ($sizes) {
             $img->resize((!empty($sizes[0])) ? $sizes[0] : 0, (!empty($sizes[1])) ? $sizes[1] : 0);
         }
         if ($configApp->watermark_enable) {
+            $offsetX = isset($configApp->attachment_wm_offsetx) ? $configApp->attachment_wm_offsetx : 10;
+            $offsetY = isset($configApp->attachment_wm_offsety) ? $configApp->attachment_wm_offsety : 10;
+            $corner = isset($configApp->attachment_wm_corner) ? $configApp->attachment_wm_corner : 4;
+            $path = Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . $configApp->attachment_wm_path;
+
             $wm_width = 0;
             $wm_height = 0;
             if (file_exists($path)) {
