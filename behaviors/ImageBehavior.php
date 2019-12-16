@@ -95,7 +95,6 @@ class ImageBehavior extends Behavior
             $pictureFileName = $uniqueName . '.' . pathinfo($file, PATHINFO_EXTENSION);
         } else {
             $pictureFileName = $uniqueName . '.' . $file->extension;
-
         }
         $path = Yii::getAlias($this->path) . DIRECTORY_SEPARATOR . $this->owner->primaryKey;
         $newAbsolutePath = $path . DIRECTORY_SEPARATOR . $pictureFileName;

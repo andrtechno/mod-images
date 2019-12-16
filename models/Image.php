@@ -17,6 +17,7 @@ use panix\engine\db\ActiveRecord;
  * @property integer $object_id
  * @property integer $is_main
  * @property string $urlAlias
+ * @property string $path
  * @property string $alt_title
  * @property string $handler_class
  * @property string $handler_hash
