@@ -68,9 +68,9 @@ class DefaultController extends Controller
 
 
 
-        if ($image && $image->getExtension() != $dotParts[1]) {
-            throw new HttpException(404, 'Image not found (extension)');
-        }
+        //if ($image && $image->getExtension() != $dotParts[1]) {
+        //    throw new HttpException(404, 'Image not found (extension)');
+        //}
 
         if ($image) {
 

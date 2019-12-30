@@ -70,8 +70,10 @@ class Image extends ActiveRecord
         //echo $filePath;
 
         $filePath = Yii::getAlias($this->path) . DIRECTORY_SEPARATOR . $this->object_id . DIRECTORY_SEPARATOR . $this->filePath;
-        //die;
 
+        if(!file_exists($filePath)){
+            $filePath = Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . 'no-image.png';
+        }
         // if (!file_exists($filePath)) {
 
         if (!file_exists($filePath)) {
@@ -98,7 +100,9 @@ class Image extends ActiveRecord
     {
         //$base = Yii::$app->getModule('images')->getStorePath();
         $filePath = Yii::getAlias($this->path) . DIRECTORY_SEPARATOR . $this->object_id . DIRECTORY_SEPARATOR . $this->filePath;
-
+        if (!file_exists($filePath)) {
+            $filePath = Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . 'no-image.png';
+        }
         return $filePath;
     }
 
@@ -173,6 +177,11 @@ class Image extends ActiveRecord
 
         if ($sizes) {
             $img->resize((!empty($sizes[0])) ? $sizes[0] : 0, (!empty($sizes[1])) ? $sizes[1] : 0);
+        }
+        if (!in_array(mb_strtolower($this->getExtension()), ['jpg', 'jpeg'])) {
+            $configApp->watermark_enable = false;
+            $img->grayscale();
+            $img->text(Yii::t('app','FILE_NOT_FOUND'),Yii::getAlias('@vendor/panix/engine/assets/assets/fonts').'/Exo2-Light.ttf', $img->getWidth() / 100 * 8, [114, 114, 114], $img::CORNER_CENTER_BOTTOM, 0, $img->getHeight() / 100 * 10, 0, 0);
         }
         if ($configApp->watermark_enable) {
             $offsetX = isset($configApp->attachment_wm_offsetx) ? $configApp->attachment_wm_offsetx : 10;
