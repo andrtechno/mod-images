@@ -165,7 +165,7 @@ class DefaultController extends Controller
             }
             $json = [
                 'status' => 'success',
-                'message' => Yii::t('app', 'SUCCESS_RECORD_DELETE')
+                'message' => Yii::t('app/default', 'SUCCESS_RECORD_DELETE')
             ];
         }
 
