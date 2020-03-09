@@ -24,10 +24,10 @@ class m170622_111540_create_image_table extends Migration
             'urlAlias' => $this->string(400)->notNull(),
             'ordern' => $this->integer()->unsigned(),
         ]);
-        $this->createIndex('ordern', Image::tableName(), 'ordern', 0);
-        $this->createIndex('object_id', Image::tableName(), 'object_id', 0);
-        $this->createIndex('is_main', Image::tableName(), 'is_main', 0);
-        $this->createIndex('handler_hash', Image::tableName(), 'is_main', 0);
+        $this->createIndex('ordern', Image::tableName(), 'ordern');
+        $this->createIndex('object_id', Image::tableName(), 'object_id');
+        $this->createIndex('is_main', Image::tableName(), 'is_main');
+        $this->createIndex('handler_hash', Image::tableName(), 'handler_hash');
     }
 
     public function down()

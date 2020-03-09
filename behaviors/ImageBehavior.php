@@ -239,16 +239,14 @@ class ImageBehavior extends Behavior
      */
     public function getImage($main = 1)
     {
+        $wheres['object_id'] = $this->owner->primaryKey;
+        $wheres['handler_hash'] = $this->owner->getHash();
+        if ($main)
+            $wheres['is_main'] = 1;
+        $query = Image::find()->where($wheres);
 
-        $query = Image::find()->where([
-            'object_id' => $this->owner->primaryKey,
-            'handler_hash' => $this->owner->getHash()
-        ]);
-        if ($main) {
-            $query->andWhere(['is_main' => 1]);
-        }
         //echo $query->createCommand()->rawSql;die;
-        $img = $query->one();
+        $img = $query->cache(3600)->one();
 
         if (!$img) {
             return NULL;
@@ -256,6 +254,7 @@ class ImageBehavior extends Behavior
 
         return $img;
     }
+
 
 
     /**
