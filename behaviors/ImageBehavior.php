@@ -44,6 +44,7 @@ class ImageBehavior extends Behavior
             ActiveRecord::EVENT_AFTER_UPDATE => 'afterSave',
             //ActiveRecord::EVENT_AFTER_FIND=>'test'
             ActiveRecord::EVENT_BEFORE_UPDATE => 'beforeSave',
+            ActiveRecord::EVENT_AFTER_DELETE => 'afterDelete',
 
         ];
     }
@@ -102,13 +103,10 @@ class ImageBehavior extends Behavior
         BaseFileHelper::createDirectory($path, 0775, true);
 
 
-
-
-
         $image = new Image;
         $image->object_id = $this->owner->primaryKey;
         $image->filePath = $pictureFileName;
-        $image->handler_class = '\\'.get_class($this->owner);
+        $image->handler_class = '\\' . get_class($this->owner);
         $image->handler_hash = $this->owner->getHash();
         $image->path = $this->path;
         $image->alt_title = $alt;
@@ -246,7 +244,7 @@ class ImageBehavior extends Behavior
         $query = Image::find()->where($wheres);
 
         //echo $query->createCommand()->rawSql;die;
-        $img = $query->cache(3600)->one();
+        $img = $query->one();
 
         if (!$img) {
             return NULL;
@@ -254,7 +252,6 @@ class ImageBehavior extends Behavior
 
         return $img;
     }
-
 
 
     /**
@@ -287,7 +284,7 @@ class ImageBehavior extends Behavior
     /**
      * Remove all model images
      */
-    public function removeImages()
+    public function afterDelete()
     {
         $images = $this->owner->getImages();
         if (count($images) < 1) {
@@ -296,10 +293,8 @@ class ImageBehavior extends Behavior
             foreach ($images as $image) {
                 $this->owner->removeImage($image);
             }
-            $storePath = Yii::$app->getModule('images')->getStorePath($this->owner);
-            $pictureSubDir = Yii::$app->getModule('images')->getModelSubDir($this->owner);
-            $dirToRemove = $storePath . DIRECTORY_SEPARATOR . $pictureSubDir;
-            BaseFileHelper::removeDirectory($dirToRemove);
+            $path = Yii::getAlias($this->path) . DIRECTORY_SEPARATOR . $this->owner->primaryKey;
+            BaseFileHelper::removeDirectory($path);
         }
     }
 
@@ -312,9 +307,6 @@ class ImageBehavior extends Behavior
      */
     public function removeImage(Image $img)
     {
-        if ($img instanceof models\PlaceHolder) {
-            return false;
-        }
 
         $storePath = Yii::$app->getModule('images')->getStorePath();
 
@@ -322,8 +314,8 @@ class ImageBehavior extends Behavior
         if (preg_match('@\.@', $fileToRemove) and is_file($fileToRemove)) {
             unlink($fileToRemove);
         }
-        //$img->delete();
-        //  return true;
+        $img->delete();
+        return true;
     }
 
     private function getImagesFinder($additionWhere = false)
