@@ -293,6 +293,7 @@ class ImageBehavior extends Behavior
             foreach ($images as $image) {
                 $this->owner->removeImage($image);
             }
+
             $path = Yii::getAlias($this->path) . DIRECTORY_SEPARATOR . $this->owner->primaryKey;
             BaseFileHelper::removeDirectory($path);
         }
