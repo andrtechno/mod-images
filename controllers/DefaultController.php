@@ -74,16 +74,14 @@ class DefaultController extends Controller
 
         if ($image) {
 
-            Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
-            // Yii::$app->response->headers->add('Content-type', 'image/jpeg');
-
+           Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
 
             //  header('Cache-control: max-age='.(60*60*24*365));
             //  header('Expires: '.gmdate(DATE_RFC1123,time()+60*60*24*365));
            // $time = (60 * 60 * 24 * 365);
            // echo $image->getUrlToOrigin();
            // die;
-
+            //Yii::$app->response->headers->remove('Cache-Control');
             //@todo no work headers
            // Yii::$app->response->headers->set('Last-Modified', gmdate('D, d M Y H:i:s', filemtime($image->getUrlToOrigin())));
            // Yii::$app->response->headers->set('Cache-Control', 'public, max-age=' . $time);
@@ -93,7 +91,9 @@ class DefaultController extends Controller
             //Yii::$app->response->headers->add('Cache-Control', 'public, max-age=' . $time);
             //Yii::$app->response->headers->add('Expires', gmdate('D, d M Y H:i:s',time()+$time).' GMT');
 
-            return $image->getContent($size);
+            return $image->getContent($size)->show();
+            //die;
+            //Yii::$app->end(304);
         } else {
             throw new HttpException(404, 'There is no images');
         }

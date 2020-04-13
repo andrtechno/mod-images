@@ -60,7 +60,7 @@ class Image extends ActiveRecord
         //$base = Yii::$app->getModule('images')->getCachePath();
         //$sub = $this->getSubDur();
 
-        $origin = $this->getPathToOrigin();
+
 
         //$filePath = $base . DIRECTORY_SEPARATOR .
         //    $sub . DIRECTORY_SEPARATOR . $this->urlAlias . $urlSize . '.' . pathinfo($origin, PATHINFO_EXTENSION);
@@ -78,8 +78,9 @@ class Image extends ActiveRecord
 
         if (!file_exists($filePath)) {
             throw new Exception('Problem with image creating.');
-        } else {
-            $this->createVersion($origin, $size);
+        } else{
+            $origin = $this->getPathToOrigin();
+            $filePath= $this->createVersion($origin, $size);
         }
         // }
 
@@ -212,8 +213,8 @@ class Image extends ActiveRecord
 
             }
         }
-        $img->show();
-        die;
+        return $img;
+       // die;
 
     }
 
