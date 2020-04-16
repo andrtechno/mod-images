@@ -201,9 +201,9 @@ class Image extends ActiveRecord
                 }
 
                 if (!($img->getWidth() <= $wm_width) || !($img->getHeight() <= $wm_height) || ($corner != 10)) {
+
                     $img->watermark($path, $offsetX, $offsetY, $corner, $wm_zoom);
                 }
-
 
             }
         }
