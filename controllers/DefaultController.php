@@ -48,8 +48,6 @@ class DefaultController extends Controller
         die;
     }
 
-
-
     public function actionGetFile($dirtyAlias)
     {
 
@@ -66,34 +64,10 @@ class DefaultController extends Controller
         /** @var $image Image */
         $image = \Yii::$app->getModule('images')->getImage($alias);
 
-
-
-        //if ($image && $image->getExtension() != $dotParts[1]) {
-        //    throw new HttpException(404, 'Image not found (extension)');
-        //}
-
         if ($image) {
-
-           Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
-
-            //  header('Cache-control: max-age='.(60*60*24*365));
-            //  header('Expires: '.gmdate(DATE_RFC1123,time()+60*60*24*365));
-           // $time = (60 * 60 * 24 * 365);
-           // echo $image->getUrlToOrigin();
-           // die;
-            //Yii::$app->response->headers->remove('Cache-Control');
-            //@todo no work headers
-           // Yii::$app->response->headers->set('Last-Modified', gmdate('D, d M Y H:i:s', filemtime($image->getUrlToOrigin())));
-           // Yii::$app->response->headers->set('Cache-Control', 'public, max-age=' . $time);
-           // Yii::$app->response->headers->set('Expires', gmdate('D, d M Y H:i:s',time()+$time).' GMT');
-
-            //Yii::$app->response->headers->add('Last-Modified', gmdate('D, d M Y H:i:s', filemtime($image->getUrlToOrigin())));
-            //Yii::$app->response->headers->add('Cache-Control', 'public, max-age=' . $time);
-            //Yii::$app->response->headers->add('Expires', gmdate('D, d M Y H:i:s',time()+$time).' GMT');
-
-            return $image->getContent($size)->show();
-            //die;
-            //Yii::$app->end(304);
+            $response = Yii::$app->getResponse();
+            $response->format = \yii\web\Response::FORMAT_RAW;
+            $image->getContent($size)->show();
         } else {
             throw new HttpException(404, 'There is no images');
         }

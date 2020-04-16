@@ -73,16 +73,11 @@ class Image extends ActiveRecord
 
         if (!file_exists($filePath)) {
             $filePath = Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . 'no-image.png';
-        }
-        // if (!file_exists($filePath)) {
-
-        if (!file_exists($filePath)) {
-            throw new Exception('Problem with image creating.');
-        } else{
+        }else{
             $origin = $this->getPathToOrigin();
             $filePath= $this->createVersion($origin, $size);
         }
-        // }
+
 
         return $filePath;
     }
@@ -175,7 +170,6 @@ class Image extends ActiveRecord
 
         $configApp = Yii::$app->settings->get('app');
 
-
         if ($sizes) {
             $img->resize((!empty($sizes[0])) ? $sizes[0] : 0, (!empty($sizes[1])) ? $sizes[1] : 0);
         }
@@ -214,8 +208,6 @@ class Image extends ActiveRecord
             }
         }
         return $img;
-       // die;
-
     }
 
     public function setMain($is_main = true)

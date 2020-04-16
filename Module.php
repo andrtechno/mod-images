@@ -38,7 +38,7 @@ class Module extends WebModule implements BootstrapInterface
             'prefix' => $this->id,
             'rules' => [
                 //'<controller:(admin|copy|auth)>' => '<controller>',
-                '<action:(crop|logo)>' => 'default/<action>',
+                '<action:(crop|logo|test)>' => 'default/<action>',
                // 'logo' => 'default/logo',
                 '<action:[0-9a-zA-Z_\-]+>/<dirtyAlias:\w.+>' => 'default/<action>',
                // '<action:[0-9a-zA-Z_\-]+>/<item:\d+>/<m:\w+>/<dirtyAlias:\w.+>' => 'default/<action>',
