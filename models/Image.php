@@ -54,30 +54,19 @@ class Image extends ActiveRecord
         ]);
     }
 
+
     public function getPath($size = false)
     {
         $urlSize = ($size) ? '_' . $size : '';
-        //$base = Yii::$app->getModule('images')->getCachePath();
-        //$sub = $this->getSubDur();
+		$filePath = Yii::getAlias($this->path) . DIRECTORY_SEPARATOR . $this->object_id . DIRECTORY_SEPARATOR . $this->filePath;
 
-
-
-        //$filePath = $base . DIRECTORY_SEPARATOR .
-        //    $sub . DIRECTORY_SEPARATOR . $this->urlAlias . $urlSize . '.' . pathinfo($origin, PATHINFO_EXTENSION);
-
-        //echo Yii::getAlias($this->path).DIRECTORY_SEPARATOR.$this->object_id.DIRECTORY_SEPARATOR.$this->filePath;
-        //echo '<br>';
-        //echo $filePath;
-
-        $filePath = Yii::getAlias($this->path) . DIRECTORY_SEPARATOR . $this->object_id . DIRECTORY_SEPARATOR . $this->filePath;
 
         if (!file_exists($filePath)) {
-            $filePath = Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . 'no-image.png';
+		    $origin = Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . 'no-image.jpg';
         }else{
             $origin = $this->getPathToOrigin();
-            $filePath= $this->createVersion($origin, $size);
         }
-
+        $filePath=$this->createVersion($origin, $size);
 
         return $filePath;
     }
