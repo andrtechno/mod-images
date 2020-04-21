@@ -86,7 +86,7 @@ class Image extends ActiveRecord
         //$base = Yii::$app->getModule('images')->getStorePath();
         $filePath = Yii::getAlias($this->path) . DIRECTORY_SEPARATOR . $this->object_id . DIRECTORY_SEPARATOR . $this->filePath;
         if (!file_exists($filePath)) {
-            $filePath = Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . 'no-image.png';
+            $filePath = Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . 'no-image.jpg';
         }
         return $filePath;
     }
