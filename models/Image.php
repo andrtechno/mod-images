@@ -5,6 +5,7 @@ namespace panix\mod\images\models;
 
 use Yii;
 use yii\base\Exception;
+use yii\helpers\FileHelper;
 use yii\helpers\Url;
 use yii\helpers\BaseFileHelper;
 use panix\engine\db\ActiveRecord;
@@ -37,11 +38,18 @@ class Image extends ActiveRecord
     public function getUrl($size = false)
     {
         $urlSize = ($size) ? '_' . $size : '';
+
         $url = Url::toRoute([
             '/images/default/get-file',
             'dirtyAlias' => $this->urlAlias . $urlSize . '.' . $this->getExtension()
         ]);
-
+        if ($size) {
+            $path = Yii::getAlias('@app/web/assets/product') . DIRECTORY_SEPARATOR . $size . DIRECTORY_SEPARATOR . $this->object_id;
+            $url = (!file_exists($path . DIRECTORY_SEPARATOR . $this->filePath)) ? "/assets/product/{$this->object_id}/{$size}/" . $this->filePath : $url;
+        } else {
+            $path = Yii::getAlias('@app/web/assets/product') . DIRECTORY_SEPARATOR . $this->object_id;
+            $url = (!file_exists($path . DIRECTORY_SEPARATOR . $this->filePath)) ? "/assets/product/{$this->object_id}/" . $this->filePath : $url;
+        }
         return $url;
     }
 
@@ -58,15 +66,15 @@ class Image extends ActiveRecord
     public function getPath($size = false)
     {
         $urlSize = ($size) ? '_' . $size : '';
-		$filePath = Yii::getAlias($this->path) . DIRECTORY_SEPARATOR . $this->object_id . DIRECTORY_SEPARATOR . $this->filePath;
+        $filePath = Yii::getAlias($this->path) . DIRECTORY_SEPARATOR . $this->object_id . DIRECTORY_SEPARATOR . $this->filePath;
 
 
         if (!file_exists($filePath)) {
-		    $origin = Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . 'no-image.jpg';
-        }else{
+            $origin = Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . 'no-image.jpg';
+        } else {
             $origin = $this->getPathToOrigin();
         }
-        $filePath=$this->createVersion($origin, $size);
+        $filePath = $this->createVersion($origin, $size);
 
         return $filePath;
     }
@@ -78,6 +86,8 @@ class Image extends ActiveRecord
         // $origin = $this->getPathToOrigin();
         //echo $origin;die;
         //$this->createVersion($origin, $size);
+
+
         return $this->getPath($size);
     }
 
@@ -93,7 +103,7 @@ class Image extends ActiveRecord
 
     public function getUrlToOrigin()
     {
-        $base = '/uploads/store/product/'.$this->object_id.'/' . $this->filePath;
+        $base = '/uploads/store/product/' . $this->object_id . '/' . $this->filePath;
         $filePath = $base;
         return $filePath;
     }
@@ -141,16 +151,33 @@ class Image extends ActiveRecord
         return $newSizes;
     }
 
-    public function createVersion($imagePath, $sizeString = false)
+    // public $assetPath;
+    public function createVersion($imagePath, $size = false)
     {
+        $sizes = explode('x', $size);
+
+        $isSaveFile = false;
+        if (isset($sizes[0]) && isset($sizes[1])) {
+            $imageAssetPath = Yii::getAlias('@app/web/assets/product') . DIRECTORY_SEPARATOR . $this->object_id . DIRECTORY_SEPARATOR . $size;
+            //   $this->assetPath = "/assets/product/{$size}/".$this->object_id;
+        } else {
+            $imageAssetPath = Yii::getAlias('@app/web/assets/product') . DIRECTORY_SEPARATOR . $this->object_id;
+            //    $this->assetPath = '/assets/product/'.$this->object_id;
+        }
 
 
-        $sizes = explode('x', $sizeString);
+        // die;
 
         /** @var $img \panix\engine\components\ImageHandler */
         $img = Yii::$app->img;
         $img->load($imagePath);
+        //echo basename($img->getFileName());
 
+
+        if (!file_exists($imageAssetPath . DIRECTORY_SEPARATOR . basename($img->getFileName()))) {
+            $isSaveFile = true;
+            FileHelper::createDirectory($imageAssetPath, 0777);
+        }
 
         $configApp = Yii::$app->settings->get('app');
 
@@ -191,7 +218,17 @@ class Image extends ActiveRecord
 
             }
         }
-        return $img;
+
+
+        if ($isSaveFile) {
+            if (isset($sizes[0]) && isset($sizes[1])) {
+                $img->thumb($sizes[0], $sizes[1]);
+            }
+            $img->save($imageAssetPath . DIRECTORY_SEPARATOR . basename($img->getFileName()));
+
+        }
+        return $img->show();
+
     }
 
     public function setMain($is_main = true)

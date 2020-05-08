@@ -250,6 +250,7 @@ class ImageBehavior extends Behavior
             return NULL;
         }
 
+
         return $img;
     }
 
