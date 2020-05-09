@@ -44,12 +44,15 @@ class Image extends ActiveRecord
             'dirtyAlias' => $this->urlAlias . $urlSize . '.' . $this->getExtension()
         ]);
         if ($size) {
-            $path = Yii::getAlias('@app/web/assets/product') . DIRECTORY_SEPARATOR . $size . DIRECTORY_SEPARATOR . $this->object_id;
-            $url = (!file_exists($path . DIRECTORY_SEPARATOR . $this->filePath)) ? "/assets/product/{$this->object_id}/{$size}/" . $this->filePath : $url;
+            $path = Yii::getAlias('@app/web/assets/product') . DIRECTORY_SEPARATOR . $this->object_id . DIRECTORY_SEPARATOR . $size;
+
+            $url = (file_exists($path . DIRECTORY_SEPARATOR . $this->filePath)) ? "/assets/product/{$this->object_id}/{$size}/" . $this->filePath : $url;
         } else {
             $path = Yii::getAlias('@app/web/assets/product') . DIRECTORY_SEPARATOR . $this->object_id;
-            $url = (!file_exists($path . DIRECTORY_SEPARATOR . $this->filePath)) ? "/assets/product/{$this->object_id}/" . $this->filePath : $url;
+
+            $url = (file_exists($path . DIRECTORY_SEPARATOR . $this->filePath)) ? "/assets/product/{$this->object_id}/" . $this->filePath : $url;
         }
+
         return $url;
     }
 
@@ -165,9 +168,6 @@ class Image extends ActiveRecord
             //    $this->assetPath = '/assets/product/'.$this->object_id;
         }
 
-
-        // die;
-
         /** @var $img \panix\engine\components\ImageHandler */
         $img = Yii::$app->img;
         $img->load($imagePath);
@@ -212,7 +212,6 @@ class Image extends ActiveRecord
                 }
 
                 if (!($img->getWidth() <= $wm_width) || !($img->getHeight() <= $wm_height) || ($corner != 10)) {
-
                     $img->watermark($path, $offsetX, $offsetY, $corner, $wm_zoom);
                 }
 
