@@ -68,7 +68,7 @@ class DefaultController extends Controller
             $response = Yii::$app->getResponse();
             $response->format = \yii\web\Response::FORMAT_RAW;
            // $image->getContent($size)->show();
-            echo $image->getContent($size);
+            $image->getContent($size)->show();
 			die;
         } else {
             throw new HttpException(404, 'There is no images');

@@ -27,7 +27,7 @@ class Image extends ActiveRecord
 {
     const MODULE_ID = 'images';
     private $helper = false;
-
+    private $existImage=true;
 
     public function getExtension()
     {
@@ -73,6 +73,7 @@ class Image extends ActiveRecord
 
 
         if (!file_exists($filePath)) {
+            $this->existImage=false;
             $origin = Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . 'no-image.jpg';
         } else {
             $origin = $this->getPathToOrigin();
@@ -99,6 +100,7 @@ class Image extends ActiveRecord
         //$base = Yii::$app->getModule('images')->getStorePath();
         $filePath = Yii::getAlias($this->path) . DIRECTORY_SEPARATOR . $this->object_id . DIRECTORY_SEPARATOR . $this->filePath;
         if (!file_exists($filePath)) {
+            $this->existImage=false;
             $filePath = Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . 'no-image.jpg';
         }
         return $filePath;
@@ -184,10 +186,10 @@ class Image extends ActiveRecord
         if ($sizes) {
             $img->resize((!empty($sizes[0])) ? $sizes[0] : 0, (!empty($sizes[1])) ? $sizes[1] : 0);
         }
-        if (!in_array(mb_strtolower($this->getExtension()), ['jpg', 'jpeg'])) {
+        if (!in_array(mb_strtolower($this->getExtension()), ['jpg', 'jpeg']) || !$this->existImage) {
             $configApp->watermark_enable = false;
             $img->grayscale();
-            $img->text(Yii::t('app/default', 'FILE_NOT_FOUND'), Yii::getAlias('@vendor/panix/engine/assets/assets/fonts') . '/Exo2-Light.ttf', $img->getWidth() / 100 * 8, [114, 114, 114], $img::POS_CENTER_BOTTOM, 0, $img->getHeight() / 100 * 10, 0, 0);
+            $img->text(Yii::t('app/default', 'FILE_NOT_FOUND'), Yii::getAlias('@vendor/panix/engine/assets/assets/fonts') . '/Exo2-Light.ttf', $img->getWidth() / 100 * 5, [114, 114, 114], $img::POS_CENTER_BOTTOM, 0, $img->getHeight() / 100 * 5, 0, 0);
         }
         if ($configApp->watermark_enable) {
             $offsetX = isset($configApp->attachment_wm_offsetx) ? $configApp->attachment_wm_offsetx : 10;
@@ -226,7 +228,7 @@ class Image extends ActiveRecord
             $img->save($imageAssetPath . DIRECTORY_SEPARATOR . basename($img->getFileName()));
 
         }
-        return $img->show();
+        return $img;
 
     }
 
