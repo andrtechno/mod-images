@@ -54,9 +54,9 @@ class ImageBehavior extends Behavior
         /** @var ActiveRecord $owner */
         $owner = $this->owner;
         $owner->file = \yii\web\UploadedFile::getInstances($owner, 'file');
-        if (count($owner->file) > Yii::$app->params['plan'][Yii::$app->params['plan_id']]['product_upload_files']) {
-            throw new ForbiddenHttpException();
-        }
+        //if (count($owner->file) > Yii::$app->params['plan'][Yii::$app->params['plan_id']]['product_upload_files']) {
+        //    throw new ForbiddenHttpException();
+        //}
 
     }
 

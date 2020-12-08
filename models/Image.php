@@ -3,6 +3,7 @@
 
 namespace panix\mod\images\models;
 
+use panix\mod\shop\components\ExternalFinder;
 use Yii;
 use yii\base\Exception;
 use yii\helpers\FileHelper;
@@ -276,7 +277,10 @@ class Image extends ActiveRecord
         if (preg_match('@\.@', $fileToRemove) and is_file($fileToRemove)) {
             unlink($fileToRemove);
         }
-
+        if (Yii::$app->hasModule('csv')) {
+            $external = new ExternalFinder('{{%csv}}');
+            $external->deleteObject(ExternalFinder::OBJECT_IMAGE, $this->id);
+        }
         parent::afterDelete();
     }
 
