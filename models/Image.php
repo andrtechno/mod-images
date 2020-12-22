@@ -189,8 +189,8 @@ class Image extends ActiveRecord
         }
         if (!in_array(mb_strtolower($this->getExtension()), ['jpg', 'jpeg']) || !$this->existImage) {
             $configApp->watermark_enable = false;
-            $img->grayscale();
-            $img->text(Yii::t('app/default', 'FILE_NOT_FOUND'), Yii::getAlias('@vendor/panix/engine/assets/assets/fonts') . '/Exo2-Light.ttf', $img->getWidth() / 100 * 5, [114, 114, 114], $img::POS_CENTER_BOTTOM, 0, $img->getHeight() / 100 * 5, 0, 0);
+          //  $img->grayscale();
+            //$img->text(Yii::t('app/default', 'FILE_NOT_FOUND'), Yii::getAlias('@vendor/panix/engine/assets/assets/fonts') . '/Exo2-Light.ttf', $img->getWidth() / 100 * 5, [114, 114, 114], $img::POS_CENTER_BOTTOM, 0, $img->getHeight() / 100 * 5, 0, 0);
         }
         if ($configApp->watermark_enable) {
             $offsetX = isset($configApp->attachment_wm_offsetx) ? $configApp->attachment_wm_offsetx : 10;
