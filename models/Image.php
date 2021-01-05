@@ -165,10 +165,10 @@ class Image extends ActiveRecord
         $isSaveFile = false;
         if (isset($sizes[0]) && isset($sizes[1])) {
             $imageAssetPath = Yii::getAlias('@app/web/assets/product') . DIRECTORY_SEPARATOR . $this->object_id . DIRECTORY_SEPARATOR . $size;
-            //   $this->assetPath = "/assets/product/{$size}/".$this->object_id;
+              $assetPath = "/assets/product/{$size}/".$this->object_id;
         } else {
             $imageAssetPath = Yii::getAlias('@app/web/assets/product') . DIRECTORY_SEPARATOR . $this->object_id;
-            //    $this->assetPath = '/assets/product/'.$this->object_id;
+                $assetPath = '/assets/product/'.$this->object_id;
         }
 
         /** @var $img \panix\engine\components\ImageHandler */
@@ -180,6 +180,8 @@ class Image extends ActiveRecord
         if (!file_exists($imageAssetPath . DIRECTORY_SEPARATOR . basename($img->getFileName()))) {
             $isSaveFile = true;
             FileHelper::createDirectory($imageAssetPath, 0777);
+        }else{
+            return $assetPath.'/'.basename($img->getFileName());
         }
 
         $configApp = Yii::$app->settings->get('app');
@@ -229,7 +231,7 @@ class Image extends ActiveRecord
             $img->save($imageAssetPath . DIRECTORY_SEPARATOR . basename($img->getFileName()));
 
         }
-        return $img;
+        return $img->show();
 
     }
 
