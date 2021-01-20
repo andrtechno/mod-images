@@ -79,6 +79,7 @@ class Image extends ActiveRecord
         } else {
             $origin = $this->getPathToOrigin();
         }
+
         $filePath = $this->createVersion($origin, $size);
 
         return $filePath;
@@ -231,7 +232,7 @@ class Image extends ActiveRecord
             $img->save($imageAssetPath . DIRECTORY_SEPARATOR . basename($img->getFileName()));
 
         }
-        return $img->show();
+        return $img;
 
     }
 

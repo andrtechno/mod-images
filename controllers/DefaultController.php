@@ -67,9 +67,23 @@ class DefaultController extends Controller
         if ($image) {
             $response = Yii::$app->getResponse();
             $response->format = \yii\web\Response::FORMAT_RAW;
-           // $image->getContent($size)->show();
-            $image->getContent($size);
-			die;
+            // $image->getContent($size)->show();
+
+            $i = $image->getContent($size);
+
+
+            if ($i instanceof \panix\engine\components\ImageHandler) {
+                $response->format = \yii\web\Response::FORMAT_RAW;
+                $i->show();
+                die;
+            } else {
+
+
+                $imginfo = getimagesize(Yii::getAlias('@webroot').$i);
+                header("Content-type: {$imginfo['mime']}");
+                return readfile(Yii::getAlias('@webroot').$i);
+               // die;
+            }
         } else {
             throw new HttpException(404, 'There is no images');
         }
