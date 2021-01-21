@@ -28,7 +28,7 @@ class Image extends ActiveRecord
 {
     const MODULE_ID = 'images';
     private $helper = false;
-    private $existImage=true;
+    private $existImage = true;
 
     public function getExtension()
     {
@@ -74,7 +74,7 @@ class Image extends ActiveRecord
 
 
         if (!file_exists($filePath)) {
-            $this->existImage=false;
+            $this->existImage = false;
             $origin = Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . 'no-image.jpg';
         } else {
             $origin = $this->getPathToOrigin();
@@ -102,7 +102,7 @@ class Image extends ActiveRecord
         //$base = Yii::$app->getModule('images')->getStorePath();
         $filePath = Yii::getAlias($this->path) . DIRECTORY_SEPARATOR . $this->object_id . DIRECTORY_SEPARATOR . $this->filePath;
         if (!file_exists($filePath)) {
-            $this->existImage=false;
+            $this->existImage = false;
             $filePath = Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . 'no-image.jpg';
         }
         return $filePath;
@@ -166,10 +166,10 @@ class Image extends ActiveRecord
         $isSaveFile = false;
         if (isset($sizes[0]) && isset($sizes[1])) {
             $imageAssetPath = Yii::getAlias('@app/web/assets/product') . DIRECTORY_SEPARATOR . $this->object_id . DIRECTORY_SEPARATOR . $size;
-              $assetPath = "/assets/product/{$size}/".$this->object_id;
+            $assetPath = "/assets/product/{$size}/" . $this->object_id;
         } else {
             $imageAssetPath = Yii::getAlias('@app/web/assets/product') . DIRECTORY_SEPARATOR . $this->object_id;
-                $assetPath = '/assets/product/'.$this->object_id;
+            $assetPath = '/assets/product/' . $this->object_id;
         }
 
         /** @var $img \panix\engine\components\ImageHandler */
@@ -181,8 +181,8 @@ class Image extends ActiveRecord
         if (!file_exists($imageAssetPath . DIRECTORY_SEPARATOR . basename($img->getFileName()))) {
             $isSaveFile = true;
             FileHelper::createDirectory($imageAssetPath, 0777);
-        }else{
-            return $assetPath.'/'.basename($img->getFileName());
+        } else {
+            return $assetPath . '/' . basename($img->getFileName());
         }
 
         $configApp = Yii::$app->settings->get('app');
@@ -190,9 +190,9 @@ class Image extends ActiveRecord
         if ($sizes) {
             $img->resize((!empty($sizes[0])) ? $sizes[0] : 0, (!empty($sizes[1])) ? $sizes[1] : 0);
         }
-        if (!in_array(mb_strtolower($this->getExtension()), ['jpg', 'jpeg']) || !$this->existImage) {
+        if (!in_array(mb_strtolower($this->getExtension()), ['jpg', 'jpeg', 'webp']) || !$this->existImage) {
             $configApp->watermark_enable = false;
-          //  $img->grayscale();
+            //  $img->grayscale();
             //$img->text(Yii::t('app/default', 'FILE_NOT_FOUND'), Yii::getAlias('@vendor/panix/engine/assets/assets/fonts') . '/Exo2-Light.ttf', $img->getWidth() / 100 * 5, [114, 114, 114], $img::POS_CENTER_BOTTOM, 0, $img->getHeight() / 100 * 5, 0, 0);
         }
         if ($configApp->watermark_enable) {
