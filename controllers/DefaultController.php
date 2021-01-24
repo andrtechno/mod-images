@@ -78,11 +78,16 @@ class DefaultController extends Controller
                 die;
             } else {
 
+                if ($i) {
+                    $imginfo = getimagesize(Yii::getAlias('@webroot') . $i);
+                    header("Content-type: {$imginfo['mime']}");
+                    return readfile(Yii::getAlias('@webroot') . $i);
+                } else {
 
-                $imginfo = getimagesize(Yii::getAlias('@webroot').$i);
-                header("Content-type: {$imginfo['mime']}");
-                return readfile(Yii::getAlias('@webroot').$i);
-               // die;
+                    throw new HttpException(404, 'There is no images [1]');
+                }
+
+                // die;
             }
         } else {
             throw new HttpException(404, 'There is no images');

@@ -26,10 +26,16 @@ class Module extends WebModule implements BootstrapInterface
     public $waterMark = '@uploads/watermark-color.png';
     public $className;
     public $imageCompressionQuality = 100;
-    //public $routes = [
-    //    'getImage/<item>/<dirtyAlias>' => 'images/default/imageByItemAndAlias',
-    //];
 
+    public function getNoImagePath()
+    {
+        return Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . 'no-image.jpg';
+    }
+
+    public function getNoImageUrl()
+    {
+        return '/uploads/no-image.jpg';
+    }
 
     public function bootstrap($app)
     {
@@ -39,9 +45,9 @@ class Module extends WebModule implements BootstrapInterface
             'rules' => [
                 //'<controller:(admin|copy|auth)>' => '<controller>',
                 '<action:(crop|logo)>' => 'default/<action>',
-               // 'logo' => 'default/logo',
+                // 'logo' => 'default/logo',
                 '<action:[0-9a-zA-Z_\-]+>/<dirtyAlias:\w.+>' => 'default/<action>',
-               // '<action:[0-9a-zA-Z_\-]+>/<item:\d+>/<m:\w+>/<dirtyAlias:\w.+>' => 'default/<action>',
+                // '<action:[0-9a-zA-Z_\-]+>/<item:\d+>/<m:\w+>/<dirtyAlias:\w.+>' => 'default/<action>',
             ],
         ]);
         $app->getUrlManager()->addRules($groupUrlRule->rules, true);
@@ -57,6 +63,7 @@ class Module extends WebModule implements BootstrapInterface
             false
         );*/
     }
+
     public function getImage($dirtyAlias)
     {
         //Get params
@@ -85,6 +92,7 @@ class Module extends WebModule implements BootstrapInterface
 
         return $image;
     }
+
     /**
      * @param $object_id
      * @param $model

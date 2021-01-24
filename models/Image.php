@@ -3,6 +3,7 @@
 
 namespace panix\mod\images\models;
 
+use panix\engine\CMS;
 use panix\mod\shop\components\ExternalFinder;
 use Yii;
 use yii\base\Exception;
@@ -75,7 +76,7 @@ class Image extends ActiveRecord
 
         if (!file_exists($filePath)) {
             $this->existImage = false;
-            $origin = Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . 'no-image.jpg';
+            $origin = Yii::$app->getModule('images')->getNoImagePath();
         } else {
             $origin = $this->getPathToOrigin();
         }
@@ -103,7 +104,7 @@ class Image extends ActiveRecord
         $filePath = Yii::getAlias($this->path) . DIRECTORY_SEPARATOR . $this->object_id . DIRECTORY_SEPARATOR . $this->filePath;
         if (!file_exists($filePath)) {
             $this->existImage = false;
-            $filePath = Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . 'no-image.jpg';
+            $filePath = Yii::$app->getModule('images')->getNoImagePath();
         }
         return $filePath;
     }
@@ -166,12 +167,14 @@ class Image extends ActiveRecord
         $isSaveFile = false;
         if (isset($sizes[0]) && isset($sizes[1])) {
             $imageAssetPath = Yii::getAlias('@app/web/assets/product') . DIRECTORY_SEPARATOR . $this->object_id . DIRECTORY_SEPARATOR . $size;
-            $assetPath = "/assets/product/{$size}/" . $this->object_id;
+            $assetPath = "/assets/product/{$this->object_id}/{$size}";
         } else {
             $imageAssetPath = Yii::getAlias('@app/web/assets/product') . DIRECTORY_SEPARATOR . $this->object_id;
             $assetPath = '/assets/product/' . $this->object_id;
         }
-
+        if (!file_exists($imagePath)) {
+            return false;
+        }
         /** @var $img \panix\engine\components\ImageHandler */
         $img = Yii::$app->img;
         $img->load($imagePath);
