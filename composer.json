@@ -2,7 +2,7 @@
     "name": "panix/mod-images",
     "description": "PIXELION CMS module images",
     "keywords": ["pixelion-cms"],
-    "type": "yii2-extension",
+    "type": "pixelion-module",
     "license": "MIT",
     "minimum-stability": "dev",
     "require": {
