@@ -7,6 +7,7 @@ use panix\engine\CMS;
 use panix\engine\components\ImageHandler;
 use Yii;
 use yii\base\Behavior;
+use yii\base\Exception;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use panix\mod\images\models;
@@ -135,7 +136,9 @@ class ImageBehavior extends Behavior
         if (is_object($file)) {
             $file->saveAs($newAbsolutePath);
         } else {
-            copy($file, $newAbsolutePath);
+            if (!@copy($file, $newAbsolutePath)) {
+                $image->delete();
+            }
         }
         $img = Yii::$app->img->load($newAbsolutePath);
         if ($img->getHeight() > Yii::$app->params['maxUploadImageSize']['height'] || $img->getWidth() > Yii::$app->params['maxUploadImageSize']['width']) {
@@ -304,8 +307,8 @@ class ImageBehavior extends Behavior
     /**
      * removes concrete model's image
      * @param Image $img
-     * @throws \Exception
      * @return bool
+     * @throws \Exception
      */
     public function removeImage(Image $img)
     {
