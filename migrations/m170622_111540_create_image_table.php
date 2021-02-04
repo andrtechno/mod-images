@@ -1,7 +1,5 @@
 <?php
 
-namespace panix\mod\images\migrations;
-
 use panix\engine\db\Migration;
 use panix\mod\images\models\Image;
 
