@@ -13,6 +13,7 @@ use yii\db\ActiveRecord;
 use panix\mod\images\models;
 use panix\mod\images\models\Image;
 use yii\helpers\BaseFileHelper;
+use yii\helpers\FileHelper;
 use yii\web\ForbiddenHttpException;
 use yii\web\UploadedFile;
 
@@ -257,7 +258,144 @@ class ImageBehavior extends Behavior
         return $img;
     }
 
+    public function getImageData($size)
+    {
+        $noImagePath = Yii::getAlias('@uploads').DIRECTORY_SEPARATOR.'no-image.jpg';
+        $wheres['object_id'] = $this->owner->primaryKey;
+        $wheres['handler_hash'] = $this->owner->getHash();
 
+        $wheres['is_main'] = 1;
+        $query = Image::find()->where($wheres);
+
+        //echo $query->createCommand()->rawSql;die;
+        /** @var Image $img */
+        $img = $query->one();
+
+        if (!$img) {
+            return (object) [
+                'url'=>$this->createVersion2($noImagePath, $size),
+               // 'model'=>$img
+            ];
+        }
+        $path = Yii::getAlias($img->path) . DIRECTORY_SEPARATOR . $img->object_id . DIRECTORY_SEPARATOR . $img->filePath;
+
+        if (file_exists($path)) {
+            $assetPath = Yii::getAlias("@web/assets/product/{$img->object_id}/{$size}") . DIRECTORY_SEPARATOR . $img->filePath;
+
+
+           // $s = $img->createVersion($path, $size);
+            return (object) [
+                'url'=>$img->createVersion($path, $size),
+                'model'=>$img
+            ];
+          //  CMS::dump($s);
+          //  die;
+        }else{
+            return (object) [
+                'url'=>$img->createVersion($noImagePath, $size),
+                'model'=>$img
+            ];
+
+        }
+
+
+     //   return $img;
+    }
+    public function getPathToOrigin($filePath)
+    {
+        //$base = Yii::$app->getModule('images')->getStorePath();
+
+        if (!file_exists($filePath)) {
+           // $this->existImage = false;
+            $filePath = Yii::$app->getModule('images')->getNoImagePath();
+        }
+        return $filePath;
+    }
+    public function getExtension($path)
+    {
+        $ext = pathinfo($this->getPathToOrigin($path), PATHINFO_EXTENSION);
+        return $ext;
+    }
+    public function createVersion2($imagePath, $size = false)
+    {
+        $owner=$this->owner;
+        $sizes = explode('x', $size);
+
+        $isSaveFile = false;
+        if (isset($sizes[0]) && isset($sizes[1])) {
+            $imageAssetPath = Yii::getAlias('@app/web/assets/product') . DIRECTORY_SEPARATOR . $owner->id . DIRECTORY_SEPARATOR . $size;
+            $assetPath = "/assets/product/{$owner->id}/{$size}";
+        } else {
+            $imageAssetPath = Yii::getAlias('@app/web/assets/product') . DIRECTORY_SEPARATOR . $owner->id;
+            $assetPath = '/assets/product/' . $owner->id;
+        }
+        if (!file_exists($imagePath)) {
+            return false;
+        }
+        /** @var $img \panix\engine\components\ImageHandler */
+        $img = Yii::$app->img;
+        $img->load($imagePath);
+        //echo basename($img->getFileName());
+
+
+        if (!file_exists($imageAssetPath . DIRECTORY_SEPARATOR . basename($img->getFileName()))) {
+            $isSaveFile = true;
+            FileHelper::createDirectory($imageAssetPath, 0777);
+        } else {
+            return $assetPath . '/' . basename($img->getFileName());
+        }
+
+        $configApp = Yii::$app->settings->get('app');
+
+        if ($sizes) {
+            $img->resize((!empty($sizes[0])) ? $sizes[0] : 0, (!empty($sizes[1])) ? $sizes[1] : 0);
+        }
+        if (!in_array(mb_strtolower($this->getExtension($imagePath)), ['jpg', 'jpeg', 'webp'])) {
+            $configApp->watermark_enable = false;
+            //$img->grayscale();
+            //$img->text(Yii::t('app/default', 'FILE_NOT_FOUND'), Yii::getAlias('@vendor/panix/engine/assets/assets/fonts') . '/Exo2-Light.ttf', $img->getWidth() / 100 * 5, [114, 114, 114], $img::POS_CENTER_BOTTOM, 0, $img->getHeight() / 100 * 5, 0, 0);
+        }
+        if ($configApp->watermark_enable) {
+            $offsetX = isset($configApp->attachment_wm_offsetx) ? $configApp->attachment_wm_offsetx : 10;
+            $offsetY = isset($configApp->attachment_wm_offsety) ? $configApp->attachment_wm_offsety : 10;
+            $corner = isset($configApp->attachment_wm_corner) ? $configApp->attachment_wm_corner : 4;
+            $path = Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . $configApp->attachment_wm_path;
+
+            $wm_width = 0;
+            $wm_height = 0;
+            if (file_exists($path)) {
+                if ($imageInfo = @getimagesize($path)) {
+                    $wm_width = (float)$imageInfo[0] + $offsetX;
+                    $wm_height = (float)$imageInfo[1] + $offsetY;
+                }
+
+                $toWidth = min($img->getWidth(), $wm_width);
+
+                if ($wm_width > $img->getWidth() || $wm_height > $img->getHeight()) {
+                    $wm_zoom = round($toWidth / $wm_width / 3, 1);
+                } else {
+                    $wm_zoom = false;
+                }
+
+                if (!($img->getWidth() <= $wm_width) || !($img->getHeight() <= $wm_height) || ($corner != 10)) {
+                    $img->watermark($path, $offsetX, $offsetY, $corner, $wm_zoom);
+                }
+
+            }
+        }
+
+
+        if ($isSaveFile) {
+            if (isset($sizes[0]) && isset($sizes[1])) {
+                $img->thumb($sizes[0], $sizes[1]);
+            }
+            $img->save($imageAssetPath . DIRECTORY_SEPARATOR . basename($img->getFileName()));
+
+        }
+        return $assetPath . '/' . basename($img->getFileName());
+        // return $img;
+
+    }
     /**
      * returns model image by name
      * @return array|null|ActiveRecord
@@ -397,5 +535,7 @@ class ImageBehavior extends Behavior
             }
         }
     }
+
+
 
 }

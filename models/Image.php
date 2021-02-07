@@ -235,7 +235,8 @@ class Image extends ActiveRecord
             $img->save($imageAssetPath . DIRECTORY_SEPARATOR . basename($img->getFileName()));
 
         }
-        return $img;
+        return $assetPath . '/' . basename($img->getFileName());
+       // return $img;
 
     }
 
