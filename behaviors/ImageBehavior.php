@@ -5,17 +5,18 @@ namespace panix\mod\images\behaviors;
 
 use panix\engine\CMS;
 use panix\engine\components\ImageHandler;
+use panix\mod\images\models;
+use panix\mod\images\models\Image;
 use Yii;
 use yii\base\Behavior;
 use yii\base\Exception;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use panix\mod\images\models;
-use panix\mod\images\models\Image;
 use yii\helpers\BaseFileHelper;
 use yii\helpers\FileHelper;
 use yii\web\ForbiddenHttpException;
 use yii\web\UploadedFile;
+use yii\httpclient\Client;
 
 /**
  * Class ImageBehavior
@@ -70,9 +71,36 @@ class ImageBehavior extends Behavior
         }
     }
 
-    /**
-     * @var ActiveRecord|null Model class, which will be used for storing image data in db, if not set default class(models/Image) will be used
-     */
+    public function downloadFile($url, $saveTo = '@runtime')
+    {
+        $filename = basename($url);
+        $savePath = Yii::getAlias($saveTo);
+        if (!file_exists($savePath)) {
+            FileHelper::createDirectory($savePath, $mode = 0775, $recursive = true);
+        }
+        $saveTo = $savePath . DIRECTORY_SEPARATOR . $filename;
+
+        //return file of exsts path
+        if (file_exists($saveTo)) {
+            return $saveTo;
+        }
+
+        $fh = fopen($saveTo, 'w');
+        $client = new Client([
+            'transport' => 'yii\httpclient\CurlTransport'
+        ]);
+        $response = $client->createRequest()
+            ->setMethod('GET')
+            ->setUrl($url)
+            ->setOutputFile($fh)
+            ->send();
+
+        if ($response->isOk) {
+            return $saveTo;
+        } else {
+            return false;
+        }
+    }
 
     /**
      *
@@ -86,6 +114,13 @@ class ImageBehavior extends Behavior
      */
     public function attachImage($file, $is_main = false, $alt = '')
     {
+        $isDownloaded = preg_match('/http(s?)\:\/\//i', $file);
+        if ($isDownloaded) {
+            $download = $this->downloadFile($file);
+            if ($download) {
+                $file = $download;
+            }
+        }
         $uniqueName = \panix\engine\CMS::gen(10);
 
 
@@ -148,7 +183,12 @@ class ImageBehavior extends Behavior
         if ($img->save($newAbsolutePath)) {
             //   unlink($runtimePath);
         }
-
+        //remove download file
+        if ($isDownloaded) {
+            if (file_exists($download)) {
+                unlink($download);
+            }
+        }
         return $image;
     }
 
@@ -260,7 +300,7 @@ class ImageBehavior extends Behavior
 
     public function getImageData($size)
     {
-        $noImagePath = Yii::getAlias('@uploads').DIRECTORY_SEPARATOR.'no-image.jpg';
+        $noImagePath = Yii::getAlias('@uploads') . DIRECTORY_SEPARATOR . 'no-image.jpg';
         $wheres['object_id'] = $this->owner->primaryKey;
         $wheres['handler_hash'] = $this->owner->getHash();
 
@@ -272,9 +312,9 @@ class ImageBehavior extends Behavior
         $img = $query->one();
 
         if (!$img) {
-            return (object) [
-                'url'=>$this->createVersion2($noImagePath, $size),
-               // 'model'=>$img
+            return (object)[
+                'url' => $this->createVersion2($noImagePath, $size),
+                // 'model'=>$img
             ];
         }
         $path = Yii::getAlias($img->path) . DIRECTORY_SEPARATOR . $img->object_id . DIRECTORY_SEPARATOR . $img->filePath;
@@ -283,42 +323,45 @@ class ImageBehavior extends Behavior
             $assetPath = Yii::getAlias("@web/assets/product/{$img->object_id}/{$size}") . DIRECTORY_SEPARATOR . $img->filePath;
 
 
-           // $s = $img->createVersion($path, $size);
-            return (object) [
-                'url'=>$img->createVersion($path, $size),
-                'model'=>$img
+            // $s = $img->createVersion($path, $size);
+            return (object)[
+                'url' => $img->createVersion($path, $size),
+                'model' => $img
             ];
-          //  CMS::dump($s);
-          //  die;
-        }else{
-            return (object) [
-                'url'=>$img->createVersion($noImagePath, $size),
-                'model'=>$img
+            //  CMS::dump($s);
+            //  die;
+        } else {
+            return (object)[
+                'url' => $img->createVersion($noImagePath, $size),
+                'model' => $img
             ];
 
         }
 
 
-     //   return $img;
+        //   return $img;
     }
+
     public function getPathToOrigin($filePath)
     {
         //$base = Yii::$app->getModule('images')->getStorePath();
 
         if (!file_exists($filePath)) {
-           // $this->existImage = false;
+            // $this->existImage = false;
             $filePath = Yii::$app->getModule('images')->getNoImagePath();
         }
         return $filePath;
     }
+
     public function getExtension($path)
     {
         $ext = pathinfo($this->getPathToOrigin($path), PATHINFO_EXTENSION);
         return $ext;
     }
+
     public function createVersion2($imagePath, $size = false)
     {
-        $owner=$this->owner;
+        $owner = $this->owner;
         $sizes = explode('x', $size);
 
         $isSaveFile = false;
@@ -396,6 +439,7 @@ class ImageBehavior extends Behavior
         // return $img;
 
     }
+
     /**
      * returns model image by name
      * @return array|null|ActiveRecord
@@ -535,7 +579,6 @@ class ImageBehavior extends Behavior
             }
         }
     }
-
 
 
 }
