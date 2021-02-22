@@ -283,6 +283,9 @@ class Image extends ActiveRecord
 
         if (preg_match('@\.@', $fileToRemove) and is_file($fileToRemove)) {
             unlink($fileToRemove);
+            if (file_exists(Yii::getAlias("@app/web/assets/product/{$this->object_id}"))) {
+                FileHelper::removeDirectory(Yii::getAlias("@app/web/assets/product/{$this->object_id}"));
+            }
         }
         if (Yii::$app->hasModule('csv')) {
             $external = new ExternalFinder('{{%csv}}');
