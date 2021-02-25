@@ -176,12 +176,14 @@ class ImageBehavior extends Behavior
                 $image->delete();
             }
         }
-        $img = Yii::$app->img->load($newAbsolutePath);
-        if ($img->getHeight() > Yii::$app->params['maxUploadImageSize']['height'] || $img->getWidth() > Yii::$app->params['maxUploadImageSize']['width']) {
-            $img->resize(Yii::$app->params['maxUploadImageSize']['width'], Yii::$app->params['maxUploadImageSize']['height']);
-        }
-        if ($img->save($newAbsolutePath)) {
-            //   unlink($runtimePath);
+        if (!$isDownloaded) {
+            $img = Yii::$app->img->load($newAbsolutePath);
+            if ($img->getHeight() > Yii::$app->params['maxUploadImageSize']['height'] || $img->getWidth() > Yii::$app->params['maxUploadImageSize']['width']) {
+                $img->resize(Yii::$app->params['maxUploadImageSize']['width'], Yii::$app->params['maxUploadImageSize']['height']);
+            }
+            if ($img->save($newAbsolutePath)) {
+                //   unlink($runtimePath);
+            }
         }
         //remove download file
         if ($isDownloaded) {
