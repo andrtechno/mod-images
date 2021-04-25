@@ -286,7 +286,7 @@ class ImageBehavior extends Behavior
         $wheres['object_id'] = $this->owner->primaryKey;
         $wheres['handler_hash'] = $this->owner->getHash();
         if ($main)
-            $wheres['is_main'] = 1;
+            $wheres['is_main'] = true;
         $query = Image::find()->where($wheres);
 
         //echo $query->createCommand()->rawSql;die;
@@ -306,8 +306,8 @@ class ImageBehavior extends Behavior
         $wheres['object_id'] = $this->owner->primaryKey;
         $wheres['handler_hash'] = $this->owner->getHash();
 
-        $wheres['is_main'] = 1;
-        $query = Image::find()->where($wheres);
+        $wheres['is_main'] = true;
+        $query = Image::find()->where($wheres)->cache(Yii::$app->db->queryCacheDuration);
 
         //echo $query->createCommand()->rawSql;die;
         /** @var Image $img */
@@ -557,11 +557,11 @@ class ImageBehavior extends Behavior
         $post = Yii::$app->request->post('AttachmentsMainId');
         if ($post) {
 
-            Image::updateAll(['is_main' => 0], 'object_id=:pid AND handler_hash=:hash', ['hash' => $this->owner->getHash(), 'pid' => $this->owner->primaryKey]);
+            Image::updateAll(['is_main' => false], 'object_id=:pid AND handler_hash=:hash', ['hash' => $this->owner->getHash(), 'pid' => $this->owner->primaryKey]);
 
             $customer = Image::findOne($post);
             if ($customer) {
-                $customer->is_main = 1;
+                $customer->is_main = true;
                 $customer->update();
             }
         }

@@ -243,9 +243,9 @@ class Image extends ActiveRecord
     public function setMain($is_main = true)
     {
         if ($is_main) {
-            $this->is_main = 1;
+            $this->is_main = true;
         } else {
-            $this->is_main = 0;
+            $this->is_main = false;
         }
     }
 
@@ -269,7 +269,8 @@ class Image extends ActiveRecord
     {
         return [
             [['filePath', 'object_id', 'urlAlias', 'handler_hash', 'handler_class'], 'required'],
-            [['object_id', 'is_main'], 'integer'],
+            [['object_id'], 'integer'],
+            [['is_main'], 'boolean'],
             [['alt_title'], 'string', 'max' => 80],
             [['filePath', 'urlAlias'], 'string', 'max' => 400],
             [['handler_class', 'handler_hash'], 'string', 'max' => 150]
